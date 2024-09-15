@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Logic Gate Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #000000, #003300); /* ไล่สีจากดำไปเขียว */
+            color: #00ff00;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .logo {
+            font-size: 6rem;
+            font-weight: bold;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+            margin-bottom: 20px;
+        }
+
+        .settings {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, #1a1a1a, #004d00); /* ไล่สีในกล่อง */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px #00ff00;
+        }
+
+        .settings label {
+            font-size: 1.5rem;
+            margin-top: 10px;
+            color: #00ff00;
+        }
+
+        .settings select,
+        .settings input[type="range"] {
+            width: 300px;
+            padding: 5px;
+            margin-top: 10px;
+            background-color: #333333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            appearance: none;
+        }
+
+        .settings input[type="range"]::-webkit-slider-thumb {
+            background: #00ff00;
+        }
+
+        .settings input[type="range"]::-moz-range-thumb {
+            background: #00ff00;
+        }
+
+        .settings span {
+            font-size: 1.5rem;
+            margin-top: 5px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #004d00, #00ff00); /* ปุ่มไล่สีจากเขียวเข้มไปเขียวอ่อน */
+            color: #000000;
+            border: none;
+            margin: 15px 0;
+            cursor: pointer;
+            border-radius: 5px;
+            box-shadow: 0 0 10px #00ff00;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #004d00;
+            color: #00ff00;
+        }
+
+        #timer {
+            font-size: 2rem;
+            margin-top: 20px;
+        }
+
+        #results {
+            text-align: center;
+            font-size: 2rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .footer-text {
+            font-size: 1.2rem;
+            margin-top: 20px;
+            color: #00ff00;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div class="logo">Logic Game</div>
+
+        <div id="settings-container" class="settings">
+            <label for="difficulty">Select Difficulty Level:</label>
+            <select id="difficulty">
+                <option value="Noob">Noob</option>
+                <option value="Normal">Normal</option>
+                <option value="Hard">Hard</option>
+                <option value="Nightmare">Nightmare</option>
+            </select>
+
+            <label for="numQuestions">Number of Questions:</label>
+            <input type="range" id="numQuestions" min="10" max="100" step="10" value="10" oninput="updateNumQuestions(this.value)">
+            <span id="numQuestionsDisplay">10</span>
+
+            <label for="timeLimit">Time Limit per Question (Seconds):</label> 
+            <input type="range" id="timeLimit" min="5" max="60" step="5" value="10" oninput="updateTimeLimit(this.value)">
+            <span id="timeLimitDisplay">10 seconds</span>
+
+            <button class="btn" onclick="startGame()">Start Game</button>
+        </div>
+
+        <div id="game-interface" class="hidden">
+            <div id="timer"></div>
+            <div id="variables" class="hidden"></div>
+            <div class="question hidden" id="question"></div>
+            <div id="answer-buttons" class="hidden">
+                <button class="btn" onclick="checkAnswer(0)">0</button>
+                <button class="btn" onclick="checkAnswer(1)">1</button>
+            </div>
+        </div>
+
+        <div id="results" class="hidden">
+            <h2>Results</h2>
+            <p id="score"></p>
+            <button class="btn" onclick="restartGame()">Restart</button>
+        </div>
+    </div>
+
+    <script>
+        const logicGates = ["AND", "OR", "XOR", "NAND", "NOR"];
+        let currentQuestion;
+        let variables = { A: 0, B: 0, C: 0, D: 0 };
+        let timeRemaining;
+        let timerInterval;
+        let numQuestions = 10;
+        let timeLimitPerQuestion = 10;
+        let questionsAnswered = 0;
+        let correctAnswers = 0;
+        let incorrectAnswers = 0;
+        let totalScore = 0;
+        let difficultyLevel = 'Noob';
+
+        function updateNumQuestions(value) {
+            numQuestions = value;
+            document.getElementById("numQuestionsDisplay").textContent = value;
+        }
+
+        function updateTimeLimit(value) {
+            timeLimitPerQuestion = value;
+            document.getElementById("timeLimitDisplay").textContent = `${value} seconds`;
+        }
+
+        function startGame() {
+            difficultyLevel = document.getElementById('difficulty').value;
+            
+            document.getElementById('settings-container').classList.add('hidden');
+            document.getElementById('game-interface').classList.remove('hidden');
+            
+            questionsAnswered = 0;
+            correctAnswers = 0;
+            incorrectAnswers = 0;
+            totalScore = 0;
+            
+            generateVariables();
+            generateQuestion();
+        }
+
+        function startTimer() {
+            timeRemaining = timeLimitPerQuestion;
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    incorrectAnswers++;
+                    adjustScore(false);
+                    questionsAnswered++;
+                    if (questionsAnswered < numQuestions) {
+                        generateVariables();
+                        generateQuestion();
+                    } else {
+                        endGame();
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            document.getElementById("timer").textContent = `Time Remaining: ${timeRemaining} seconds`;
+        }
+
+        function generateVariables() {
+            const values = Array.from({ length: 4 }, () => Math.round(Math.random()));
+            variables = { A: values[0], B: values[1], C: values[2], D: values[3] };
+            
+            document.getElementById('variables').innerHTML = `
+                A = ${variables.A}, B = ${variables.B}, C = ${variables.C}, D = ${variables.D}
+            `;
+            document.getElementById('variables').classList.remove('hidden');
+        }
+
+        function generateQuestion() {
+            let numGates;
+            switch(difficultyLevel) {
+                case 'Noob':
+                    numGates = 4;
+                    break;
+                case 'Normal':
+                    numGates = 6;
+                    break;
+                case 'Hard':
+                    numGates = 8;
+                    break;
+                case 'Nightmare':
+                    numGates = 10;
+                    break;
+            }
+
+            const variablesOrder = ['A', 'B', 'C', 'D'].sort(() => Math.random() - 0.5);
+            const inputValues = variablesOrder.map(v => variables[v]);
+
+            const gates = Array.from({ length: numGates }, () => logicGates[Math.floor(Math.random() * logicGates.length)]);
+
+            let result = inputValues[0];
+            let questionText = `(${variablesOrder[0]})`;
+            
+            for (let i = 0; i < numGates; i++) {
+                result = calculateLogicGate(gates[i], [result, inputValues[(i + 1) % inputValues.length]]);
+                questionText += ` ${gates[i]} (${variablesOrder[(i + 1) % variablesOrder.length]}) `;
+                if (i < numGates - 1) {
+                    questionText += `----> `;
+                }
+            }
+
+            currentQuestion = { gates, result };
+
+            document.getElementById("question").innerHTML = `${questionText}`;
+            document.getElementById('question').classList.remove('hidden');
+            document.getElementById('answer-buttons').classList.remove('hidden');
+            
+            startTimer();
+        }
+
+        // แก้ไขฟังก์ชันนี้เพื่อคืนค่า 1 หรือ 0 แทน true หรือ false
+        function calculateLogicGate(gate, inputs) {
+            switch(gate) {
+                case "AND":
+                    return inputs[0] && inputs[1] ? 1 : 0;
+                case "OR":
+                    return inputs[0] || inputs[1] ? 1 : 0;
+                case "XOR":
+                    return inputs[0] !== inputs[1] ? 1 : 0;
+                case "NAND":
+                    return !(inputs[0] && inputs[1]) ? 1 : 0;
+                case "NOR":
+                    return !(inputs[0] || inputs[1]) ? 1 : 0;
+            }
+        }
+
+        function checkAnswer(answer) {
+            clearInterval(timerInterval);
+            if (currentQuestion.result === answer) {
+                correctAnswers++;
+                adjustScore(true);
+            } else {
+                incorrectAnswers++;
+                adjustScore(false);
+            }
+            questionsAnswered++;
+
+            if (questionsAnswered < numQuestions) {
+                generateVariables();
+                generateQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function adjustScore(isCorrect) {
+            let baseScore = 100;
+            let timeFactor = 60 / timeLimitPerQuestion;
+
+            if (isCorrect) {
+                totalScore += baseScore * timeFactor;
+            } else {
+                totalScore -= baseScore * timeFactor;
+            }
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            document.getElementById('game-interface').classList.add('hidden');
+            document.getElementById('results').classList.remove('hidden');
+            document.getElementById('score').textContent = `Correct: ${correctAnswers}, Incorrect: ${incorrectAnswers}, Total Score: ${totalScore}`;
+        }
+
+        function restartGame() {
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('settings-container').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
