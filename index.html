@@ -19,7 +19,7 @@
         }
 
         .logo {
-            font-size: 6rem;
+            font-size: 4rem;
             font-weight: bold;
             color: #00ff00;
             text-shadow: 0 0 10px #00ff00;
@@ -34,18 +34,20 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 15px #00ff00;
+            width: 90%;
+            max-width: 500px;
         }
 
         .settings label {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             margin-top: 10px;
             color: #00ff00;
         }
 
         .settings select,
         .settings input[type="range"] {
-            width: 300px;
-            padding: 5px;
+            width: 100%;
+            padding: 10px;
             margin-top: 10px;
             background-color: #333333;
             color: #00ff00;
@@ -63,13 +65,13 @@
         }
 
         .settings span {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             margin-top: 5px;
         }
 
         .btn {
             padding: 10px 20px;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             background: linear-gradient(135deg, #004d00, #00ff00); /* ปุ่มไล่สีจากเขียวเข้มไปเขียวอ่อน */
             color: #000000;
             border: none;
@@ -86,13 +88,13 @@
         }
 
         #timer {
-            font-size: 2rem;
+            font-size: 1.5rem;
             margin-top: 20px;
         }
 
         #results {
             text-align: center;
-            font-size: 2rem;
+            font-size: 1.5rem;
         }
 
         .hidden {
@@ -103,6 +105,34 @@
             font-size: 1.2rem;
             margin-top: 20px;
             color: #00ff00;
+        }
+
+        /* ปรับแต่งเพิ่มเติมสำหรับหน้าจอขนาดเล็ก (มือถือ) */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 3rem;
+            }
+
+            .settings {
+                padding: 15px;
+            }
+
+            .settings label, .settings span {
+                font-size: 1rem;
+            }
+
+            .btn {
+                padding: 8px 15px;
+                font-size: 1rem;
+            }
+
+            #timer {
+                font-size: 1.2rem;
+            }
+
+            #results {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
@@ -265,7 +295,6 @@
             startTimer();
         }
 
-        // แก้ไขฟังก์ชันนี้เพื่อคืนค่า 1 หรือ 0 แทน true หรือ false
         function calculateLogicGate(gate, inputs) {
             switch(gate) {
                 case "AND":
