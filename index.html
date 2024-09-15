@@ -1,51 +1,21 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Logic Gate Game</title>
+    <title>Logic Gate Game</title>
     <style>
+        /* Basic CSS styling */
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #000000, #003300);
-            color: #00ff00;
-            display: flex;
+            font-family: Arial, sans-serif;
         }
 
         #sidebar {
-            width: 250px;
-            background-color: #111;
-            height: 100vh;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-            transition: width 0.3s ease;
-            overflow: hidden;
-        }
-
-        #sidebar.collapsed {
-            width: 60px;
-        }
-
-        #toggle-sidebar {
-            background-color: #333;
-            color: #00ff00;
-            border: none;
+            width: 200px;
+            float: left;
+            background-color: #f4f4f4;
             padding: 10px;
-            cursor: pointer;
-            text-align: center;
-            width: 100%;
-        }
-
-        #sidebar h2 {
-            color: #00ff00;
-            text-align: center;
-            display: none;
-        }
-
-        #sidebar.collapsed h2 {
-            display: block;
+            border-right: 1px solid #ccc;
         }
 
         #sidebar ul {
@@ -54,137 +24,79 @@
         }
 
         #sidebar ul li {
-            margin: 20px 0;
-            text-align: center;
+            margin-bottom: 10px;
         }
 
-        #sidebar ul li a {
-            color: #00ff00;
+        #sidebar a {
             text-decoration: none;
-            font-size: 1.2rem;
-            display: block;
-            transition: opacity 0.3s;
+            color: #000;
+            font-weight: bold;
         }
 
-        #sidebar.collapsed ul li a {
-            opacity: 0;
+        #sidebar a:hover {
+            color: #007BFF;
         }
 
         #content {
-            flex-grow: 1;
+            margin-left: 220px;
             padding: 20px;
-        }
-
-        .logo {
-            font-size: 4rem;
-            font-weight: bold;
-            text-shadow: 0 0 10px #00ff00;
-        }
-
-        .settings {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: linear-gradient(135deg, #1a1a1a, #004d00);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 15px #00ff00;
-        }
-
-        .settings label {
-            font-size: 1.2rem;
-            margin-top: 10px;
-        }
-
-        .settings select,
-        .settings input[type="range"] {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            background-color: #333333;
-            color: #00ff00;
-            border: 1px solid #00ff00;
-            border-radius: 5px;
-            appearance: none;
-        }
-
-        .settings input[type="range"]::-webkit-slider-thumb {
-            background: #00ff00;
-        }
-
-        .settings input[type="range"]::-moz-range-thumb {
-            background: #00ff00;
-        }
-
-        .settings span {
-            font-size: 1.2rem;
-            margin-top: 5px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            font-size: 1.2rem;
-            background: linear-gradient(135deg, #004d00, #00ff00);
-            color: #000000;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            box-shadow: 0 0 10px #00ff00;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .btn:hover {
-            background-color: #004d00;
-            color: #00ff00;
-        }
-
-        #timer {
-            font-size: 1.5rem;
-            margin-top: 20px;
-        }
-
-        #results {
-            text-align: center;
-            font-size: 1.5rem;
         }
 
         .hidden {
             display: none;
         }
 
-        .footer-text {
-            font-size: 1.2rem;
+        #timer {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 1em;
+        }
+
+        h2 {
+            color: #007BFF;
+        }
+
+        #settings-container,
+        #game-interface,
+        #results {
             margin-top: 20px;
         }
 
-        @media (max-width: 768px) {
-            #sidebar {
-                width: 200px;
-            }
+        #answer-buttons button {
+            width: 100px;
+        }
 
-            .logo {
-                font-size: 2rem;
-            }
+        #score-board ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #score-board ul li {
+            margin-bottom: 5px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div id="sidebar">
-        <button id="toggle-sidebar">≡</button>
-        <h2>Menu</h2>
+        <button id="toggle-sidebar">Toggle Sidebar</button>
         <ul>
-            <li><a href="#game">Game</a></li>
+            <li><a href="#settings-container">Settings</a></li>
+            <li><a href="#game-interface">Game</a></li>
             <li><a href="#score-board">Score Board</a></li>
-            <li><a href="#primary-logic">Primary Logic</a></li>
-            <li><a href="#credit">Credit Developer</a></li>
         </ul>
     </div>
 
     <div id="content">
-        <div class="logo">Logic Game</div>
-
-        <div id="settings-container" class="settings">
-            <label for="difficulty">Select Difficulty Level:</label>
+        <!-- Settings -->
+        <div id="settings-container">
+            <h2>Game Settings</h2>
+            <label for="difficulty">Select Difficulty:</label>
             <select id="difficulty">
                 <option value="Noob">Noob</option>
                 <option value="Normal">Normal</option>
@@ -192,65 +104,50 @@
                 <option value="Nightmare">Nightmare</option>
             </select>
 
+            <br><br>
+
             <label for="numQuestions">Number of Questions:</label>
-            <input type="range" id="numQuestions" min="10" max="100" step="10" value="10" oninput="updateNumQuestions(this.value)">
+            <input type="range" id="numQuestions" min="5" max="20" value="10" oninput="updateNumQuestions(this.value)">
             <span id="numQuestionsDisplay">10</span>
 
-            <label for="timeLimit">Time Limit per Question (Seconds):</label>
-            <input type="range" id="timeLimit" min="5" max="60" step="5" value="10" oninput="updateTimeLimit(this.value)">
+            <br><br>
+
+            <label for="timeLimit">Time Limit per Question:</label>
+            <input type="range" id="timeLimit" min="5" max="30" value="10" oninput="updateTimeLimit(this.value)">
             <span id="timeLimitDisplay">10 seconds</span>
 
-            <button class="btn" onclick="startGame()">Start Game</button>
+            <br><br>
+
+            <button onclick="startGame()">Start Game</button>
         </div>
 
+        <!-- Game Interface -->
         <div id="game-interface" class="hidden">
-            <div id="timer"></div>
-            <div id="variables" class="hidden"></div>
-            <div class="question hidden" id="question"></div>
+            <h2>Logic Gate Game</h2>
+            <p id="timer">Time Remaining: 10 seconds</p>
+            <p id="variables" class="hidden"></p>
+            <p id="question" class="hidden"></p>
+
             <div id="answer-buttons" class="hidden">
-                <button class="btn" onclick="checkAnswer(0)">0</button>
-                <button class="btn" onclick="checkAnswer(1)">1</button>
+                <button onclick="checkAnswer(1)">1</button>
+                <button onclick="checkAnswer(0)">0</button>
             </div>
         </div>
 
+        <!-- Game Results -->
         <div id="results" class="hidden">
-            <h2>Game Over</h2>
+            <h2>Game Results</h2>
             <p id="score"></p>
+            <button onclick="startGame()">Play Again</button>
         </div>
 
+        <!-- Score Board -->
         <div id="score-board" class="hidden">
             <h2>Score Board</h2>
-            <p>Top Score ของแต่ละระดับความยาก</p>
             <ul id="score-list"></ul>
         </div>
-
-        <div id="primary-logic" class="hidden">
-            <h2>Primary Logic</h2>
-            <p>**Digital Logic Gates** เป็นส่วนประกอบสำคัญในวงจรดิจิทัล ซึ่งแต่ละ gate จะทำหน้าที่เฉพาะเจาะจงในการประมวลผลสัญญาณที่เข้ามาเพื่อส่งออกผลลัพธ์ตามฟังก์ชันต่างๆ ได้แก่:</p>
-            <ul>
-                <li><strong>AND Gate:</strong> ให้ผลลัพธ์เป็น 1 เมื่ออินพุตทั้งสองเป็น 1</li>
-                <li><strong>OR Gate:</strong> ให้ผลลัพธ์เป็น 1 เมื่อมีอินพุตอย่างน้อยหนึ่งเป็น 1</li>
-                <li><strong>XOR Gate:</strong> ให้ผลลัพธ์เป็น 1 เมื่ออินพุตสองค่ามีค่าไม่เท่ากัน</li>
-                <li><strong>NAND Gate:</strong> ให้ผลลัพธ์เป็น 0 เมื่ออินพุตทั้งสองเป็น 1</li>
-                <li><strong>NOR Gate:</strong> ให้ผลลัพธ์เป็น 0 เมื่อมีอินพุตอย่างน้อยหนึ่งเป็น 1</li>
-                <li><strong>NOT Gate:</strong> เป็น gate เดี่ยวที่ทำหน้าที่กลับค่าจาก 1 เป็น 0 และจาก 0 เป็น 1</li>
-            </ul>
-            <p>Gate เหล่านี้ถูกใช้งานในการสร้างวงจรที่ซับซ้อน เช่น เครื่องคำนวณ หน่วยความจำ และหน่วยประมวลผลของคอมพิวเตอร์ โดยทำงานบนพื้นฐานของระบบเลขฐานสอง (0 และ 1) ซึ่งเป็นหัวใจสำคัญของการทำงานของอุปกรณ์ดิจิทัล.</p>
-            <img src="primary-logic.png" alt="Primary Logic Gates">
-        </div>
-
-        <div id="credit" class="hidden">
-            <h2>Credit Developer</h2>
-            <p>ชื่อ: สิริณัฏฐ์ ชูชาติไพศาล</p>
-            <p>ศึกษาอยู่ที่: เทคโนโลยีภาคตะวันออก(อี.เทค)</p>
-            <p>ผลงาน:</p>
-            <ul>
-                <li>แข่งขันทักษะภายใน Dev C++ ได้รองชนะเลิศอันดับหนึ่ง</li>
-                <li>แข่งขันทักษะฝีมือแรงงานแห่งชาติ ได้รองชนะเลิศอันดับหนึ่ง</li>
-                <li>ได้รับเกียรตินิยมอันดับ 1 ปวช.2</li>
-            </ul>
-        </div>
     </div>
+
     <script>
         let scores = {
             Noob: 0,
@@ -310,6 +207,7 @@
         function startGame() {
             difficultyLevel = document.getElementById('difficulty').value;
 
+            // Reset game interface and scores
             document.getElementById('settings-container').classList.add('hidden');
             document.getElementById('game-interface').classList.remove('hidden');
 
@@ -323,6 +221,8 @@
         }
 
         function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);  // Clear any previous interval
+
             timeRemaining = timeLimitPerQuestion;
             updateTimerDisplay();
             timerInterval = setInterval(() => {
@@ -382,7 +282,7 @@
             let questionText = `(${variablesOrder[0]})`;
 
             for (let i = 0; i < numGates; i++) {
-                result = calculateLogicGate(gates[i], [result, inputValues[(i + 1) % inputValues.length)]);
+                result = calculateLogicGate(gates[i], [result, inputValues[(i + 1) % inputValues.length]]);
                 questionText += ` ${gates[i]} (${variablesOrder[(i + 1) % variablesOrder.length]}) `;
                 if (i < numGates - 1) {
                     questionText += `----> `;
@@ -414,7 +314,7 @@
         }
 
         function checkAnswer(answer) {
-            clearInterval(timerInterval);
+            clearInterval(timerInterval); // Ensure the timer is stopped
             if (currentQuestion.result === answer) {
                 correctAnswers++;
                 adjustScore(true);
@@ -460,7 +360,6 @@
                 <li>Nightmare: ${scores.Nightmare}</li>
             `;
         }
-
     </script>
 </body>
 </html>
