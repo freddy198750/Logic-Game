@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,39 +9,91 @@
             margin: 0;
             padding: 0;
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #000000, #003300); /* ไล่สีจากดำไปเขียว */
+            background: linear-gradient(135deg, #000000, #003300);
             color: #00ff00;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+        }
+
+        #sidebar {
+            width: 250px;
+            background-color: #111;
             height: 100vh;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            transition: width 0.3s ease;
+            overflow: hidden;
+        }
+
+        #sidebar.collapsed {
+            width: 60px;
+        }
+
+        #toggle-sidebar {
+            background-color: #333;
+            color: #00ff00;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            text-align: center;
+            width: 100%;
+        }
+
+        #sidebar h2 {
+            color: #00ff00;
+            text-align: center;
+            display: none;
+        }
+
+        #sidebar.collapsed h2 {
+            display: block;
+        }
+
+        #sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #sidebar ul li {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        #sidebar ul li a {
+            color: #00ff00;
+            text-decoration: none;
+            font-size: 1.2rem;
+            display: block;
+            transition: opacity 0.3s;
+        }
+
+        #sidebar.collapsed ul li a {
+            opacity: 0;
+        }
+
+        #content {
+            flex-grow: 1;
+            padding: 20px;
         }
 
         .logo {
             font-size: 4rem;
             font-weight: bold;
-            color: #00ff00;
             text-shadow: 0 0 10px #00ff00;
-            margin-bottom: 20px;
         }
 
         .settings {
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: linear-gradient(135deg, #1a1a1a, #004d00); /* ไล่สีในกล่อง */
+            background: linear-gradient(135deg, #1a1a1a, #004d00);
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 15px #00ff00;
-            width: 90%;
-            max-width: 500px;
         }
 
         .settings label {
             font-size: 1.2rem;
             margin-top: 10px;
-            color: #00ff00;
         }
 
         .settings select,
@@ -72,10 +124,9 @@
         .btn {
             padding: 10px 20px;
             font-size: 1.2rem;
-            background: linear-gradient(135deg, #004d00, #00ff00); /* ปุ่มไล่สีจากเขียวเข้มไปเขียวอ่อน */
+            background: linear-gradient(135deg, #004d00, #00ff00);
             color: #000000;
             border: none;
-            margin: 15px 0;
             cursor: pointer;
             border-radius: 5px;
             box-shadow: 0 0 10px #00ff00;
@@ -104,41 +155,32 @@
         .footer-text {
             font-size: 1.2rem;
             margin-top: 20px;
-            color: #00ff00;
         }
 
-        /* ปรับแต่งเพิ่มเติมสำหรับหน้าจอขนาดเล็ก (มือถือ) */
         @media (max-width: 768px) {
+            #sidebar {
+                width: 200px;
+            }
+
             .logo {
-                font-size: 3rem;
-            }
-
-            .settings {
-                padding: 15px;
-            }
-
-            .settings label, .settings span {
-                font-size: 1rem;
-            }
-
-            .btn {
-                padding: 8px 15px;
-                font-size: 1rem;
-            }
-
-            #timer {
-                font-size: 1.2rem;
-            }
-
-            #results {
-                font-size: 1.2rem;
+                font-size: 2rem;
             }
         }
     </style>
 </head>
 <body>
+    <div id="sidebar">
+        <button id="toggle-sidebar">≡</button>
+        <h2>Menu</h2>
+        <ul>
+            <li><a href="#game">Game</a></li>
+            <li><a href="#score-board">Score Board</a></li>
+            <li><a href="#primary-logic">Primary Logic</a></li>
+            <li><a href="#credit">Credit Developer</a></li>
+        </ul>
+    </div>
 
-    <div id="game-container">
+    <div id="content">
         <div class="logo">Logic Game</div>
 
         <div id="settings-container" class="settings">
@@ -154,7 +196,7 @@
             <input type="range" id="numQuestions" min="10" max="100" step="10" value="10" oninput="updateNumQuestions(this.value)">
             <span id="numQuestionsDisplay">10</span>
 
-            <label for="timeLimit">Time Limit per Question (Seconds):</label> 
+            <label for="timeLimit">Time Limit per Question (Seconds):</label>
             <input type="range" id="timeLimit" min="5" max="60" step="5" value="10" oninput="updateTimeLimit(this.value)">
             <span id="timeLimitDisplay">10 seconds</span>
 
@@ -172,13 +214,51 @@
         </div>
 
         <div id="results" class="hidden">
-            <h2>Results</h2>
+            <h2>Game Over</h2>
             <p id="score"></p>
-            <button class="btn" onclick="restartGame()">Restart</button>
+        </div>
+
+        <div id="score-board" class="hidden">
+            <h2>Score Board</h2>
+            <p>Top Score ของแต่ละระดับความยาก</p>
+            <ul id="score-list"></ul>
+        </div>
+
+        <div id="primary-logic" class="hidden">
+            <h2>Primary Logic</h2>
+            <p>**Digital Logic Gates** เป็นส่วนประกอบสำคัญในวงจรดิจิทัล ซึ่งแต่ละ gate จะทำหน้าที่เฉพาะเจาะจงในการประมวลผลสัญญาณที่เข้ามาเพื่อส่งออกผลลัพธ์ตามฟังก์ชันต่างๆ ได้แก่:</p>
+            <ul>
+                <li><strong>AND Gate:</strong> ให้ผลลัพธ์เป็น 1 เมื่ออินพุตทั้งสองเป็น 1</li>
+                <li><strong>OR Gate:</strong> ให้ผลลัพธ์เป็น 1 เมื่อมีอินพุตอย่างน้อยหนึ่งเป็น 1</li>
+                <li><strong>XOR Gate:</strong> ให้ผลลัพธ์เป็น 1 เมื่ออินพุตสองค่ามีค่าไม่เท่ากัน</li>
+                <li><strong>NAND Gate:</strong> ให้ผลลัพธ์เป็น 0 เมื่ออินพุตทั้งสองเป็น 1</li>
+                <li><strong>NOR Gate:</strong> ให้ผลลัพธ์เป็น 0 เมื่อมีอินพุตอย่างน้อยหนึ่งเป็น 1</li>
+                <li><strong>NOT Gate:</strong> เป็น gate เดี่ยวที่ทำหน้าที่กลับค่าจาก 1 เป็น 0 และจาก 0 เป็น 1</li>
+            </ul>
+            <p>Gate เหล่านี้ถูกใช้งานในการสร้างวงจรที่ซับซ้อน เช่น เครื่องคำนวณ หน่วยความจำ และหน่วยประมวลผลของคอมพิวเตอร์ โดยทำงานบนพื้นฐานของระบบเลขฐานสอง (0 และ 1) ซึ่งเป็นหัวใจสำคัญของการทำงานของอุปกรณ์ดิจิทัล.</p>
+            <img src="primary-logic.png" alt="Primary Logic Gates">
+        </div>
+
+        <div id="credit" class="hidden">
+            <h2>Credit Developer</h2>
+            <p>ชื่อ: สิริณัฏฐ์ ชูชาติไพศาล</p>
+            <p>ศึกษาอยู่ที่: เทคโนโลยีภาคตะวันออก(อี.เทค)</p>
+            <p>ผลงาน:</p>
+            <ul>
+                <li>แข่งขันทักษะภายใน Dev C++ ได้รองชนะเลิศอันดับหนึ่ง</li>
+                <li>แข่งขันทักษะฝีมือแรงงานแห่งชาติ ได้รองชนะเลิศอันดับหนึ่ง</li>
+                <li>ได้รับเกียรตินิยมอันดับ 1 ปวช.2</li>
+            </ul>
         </div>
     </div>
-
     <script>
+        let scores = {
+            Noob: 0,
+            Normal: 0,
+            Hard: 0,
+            Nightmare: 0
+        };
+
         const logicGates = ["AND", "OR", "XOR", "NAND", "NOR"];
         let currentQuestion;
         let variables = { A: 0, B: 0, C: 0, D: 0 };
@@ -192,6 +272,31 @@
         let totalScore = 0;
         let difficultyLevel = 'Noob';
 
+        document.querySelector('#toggle-sidebar').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        });
+
+        document.querySelectorAll('#sidebar a').forEach(link => {
+            link.addEventListener('click', function (event) {
+                event.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+
+                document.querySelectorAll('#content > div').forEach(div => {
+                    div.classList.add('hidden');
+                });
+
+                if (targetId === 'game') {
+                    document.getElementById('settings-container').classList.remove('hidden');
+                } else {
+                    document.getElementById(targetId).classList.remove('hidden');
+                }
+
+                if (targetId === "score-board") {
+                    updateScoreBoard();
+                }
+            });
+        });
+
         function updateNumQuestions(value) {
             numQuestions = value;
             document.getElementById("numQuestionsDisplay").textContent = value;
@@ -204,15 +309,15 @@
 
         function startGame() {
             difficultyLevel = document.getElementById('difficulty').value;
-            
+
             document.getElementById('settings-container').classList.add('hidden');
             document.getElementById('game-interface').classList.remove('hidden');
-            
+
             questionsAnswered = 0;
             correctAnswers = 0;
             incorrectAnswers = 0;
             totalScore = 0;
-            
+
             generateVariables();
             generateQuestion();
         }
@@ -223,7 +328,7 @@
             timerInterval = setInterval(() => {
                 timeRemaining--;
                 updateTimerDisplay();
-                
+
                 if (timeRemaining <= 0) {
                     clearInterval(timerInterval);
                     incorrectAnswers++;
@@ -246,16 +351,14 @@
         function generateVariables() {
             const values = Array.from({ length: 4 }, () => Math.round(Math.random()));
             variables = { A: values[0], B: values[1], C: values[2], D: values[3] };
-            
-            document.getElementById('variables').innerHTML = `
-                A = ${variables.A}, B = ${variables.B}, C = ${variables.C}, D = ${variables.D}
-            `;
+
+            document.getElementById('variables').innerHTML = `A = ${variables.A}, B = ${variables.B}, C = ${variables.C}, D = ${variables.D}`;
             document.getElementById('variables').classList.remove('hidden');
         }
 
         function generateQuestion() {
             let numGates;
-            switch(difficultyLevel) {
+            switch (difficultyLevel) {
                 case 'Noob':
                     numGates = 4;
                     break;
@@ -277,9 +380,9 @@
 
             let result = inputValues[0];
             let questionText = `(${variablesOrder[0]})`;
-            
+
             for (let i = 0; i < numGates; i++) {
-                result = calculateLogicGate(gates[i], [result, inputValues[(i + 1) % inputValues.length]]);
+                result = calculateLogicGate(gates[i], [result, inputValues[(i + 1) % inputValues.length)]);
                 questionText += ` ${gates[i]} (${variablesOrder[(i + 1) % variablesOrder.length]}) `;
                 if (i < numGates - 1) {
                     questionText += `----> `;
@@ -291,12 +394,12 @@
             document.getElementById("question").innerHTML = `${questionText}`;
             document.getElementById('question').classList.remove('hidden');
             document.getElementById('answer-buttons').classList.remove('hidden');
-            
+
             startTimer();
         }
 
         function calculateLogicGate(gate, inputs) {
-            switch(gate) {
+            switch (gate) {
                 case "AND":
                     return inputs[0] && inputs[1] ? 1 : 0;
                 case "OR":
@@ -342,15 +445,22 @@
 
         function endGame() {
             clearInterval(timerInterval);
+            scores[difficultyLevel] = Math.max(scores[difficultyLevel], totalScore);
             document.getElementById('game-interface').classList.add('hidden');
             document.getElementById('results').classList.remove('hidden');
             document.getElementById('score').textContent = `Correct: ${correctAnswers}, Incorrect: ${incorrectAnswers}, Total Score: ${totalScore}`;
         }
 
-        function restartGame() {
-            document.getElementById('results').classList.add('hidden');
-            document.getElementById('settings-container').classList.remove('hidden');
+        function updateScoreBoard() {
+            const scoreList = document.getElementById('score-list');
+            scoreList.innerHTML = `
+                <li>Noob: ${scores.Noob}</li>
+                <li>Normal: ${scores.Normal}</li>
+                <li>Hard: ${scores.Hard}</li>
+                <li>Nightmare: ${scores.Nightmare}</li>
+            `;
         }
+
     </script>
 </body>
 </html>
