@@ -3,158 +3,111 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="เว็บย่อสมการ Boolean จากสูตรที่พิมพ์หรือรูปภาพด้วย OCR รองรับ BAR, XOR, XNOR และตัวแปรตั้งชื่อเอง" />
-  <title>Boolean Simplifier — ย่อสมการจากสูตรหรือรูป</title>
+  <meta name="description" content="Boolean Simplifier — พิมพ์สูตรหรือใช้รูปเพื่อย่อสมการ Boolean" />
+  <title>Boolean Simplifier</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="v3.css" />
   <link rel="stylesheet" href="v4.css" />
+  <link rel="stylesheet" href="v5.css" />
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
   <script src="app.js" defer></script>
   <script src="v3.js" defer></script>
   <script src="v4.js" defer></script>
 </head>
 <body>
-  <main class="shell">
+  <main class="shell calculator-shell">
     <nav class="top-nav" aria-label="เมนูหลัก">
       <a class="brand-link" href="./">Boolean Simplifier</a>
       <div class="nav-tabs">
         <a class="nav-tab active" href="./" aria-current="page">คำนวณ</a>
-        <a class="nav-tab" href="docs.html">คู่มือการใช้งาน</a>
+        <a class="nav-tab" href="docs.html">คู่มือ</a>
       </div>
     </nav>
 
-    <header class="hero">
-      <div class="badge">Boolean Logic • OCR • BAR • XOR</div>
-      <h1>Boolean Simplifier</h1>
-      <p>พิมพ์สูตร หรือแนบรูปสมการ แล้วให้เว็บช่วยอ่าน Bar จากตำแหน่งในภาพ แยกหลายข้อ และย่อให้อยู่ในรูป SOP ที่สั้นลง</p>
+    <header class="calc-header">
+      <div>
+        <span class="eyebrow">BOOLEAN SIMPLIFIER</span>
+        <h1>ย่อสมการ</h1>
+      </div>
+      <button id="exampleBtn" class="ghost-btn" type="button">ตัวอย่าง</button>
     </header>
 
-    <section class="grid">
-      <article class="card input-card">
-        <div class="section-head">
-          <div>
-            <span class="eyebrow">INPUT</span>
-            <h2>ใส่สมการ</h2>
-          </div>
-          <button id="exampleBtn" class="ghost-btn" type="button">สุ่มตัวอย่าง</button>
-        </div>
-
-        <label for="formulaInput">สูตร Boolean</label>
-        <textarea id="formulaInput" rows="5" spellcheck="false" autocomplete="off" placeholder="เช่น X = A.B + A.B', X⊕Y, BAR(X+Y)"></textarea>
+    <section class="grid calculator-grid">
+      <article class="card input-card compact-card">
+        <label for="formulaInput">สูตร</label>
+        <textarea id="formulaInput" rows="5" spellcheck="false" autocomplete="off" placeholder="A*B + A*B'"></textarea>
 
         <div class="symbol-toolbar" aria-label="แทรกสัญลักษณ์ Boolean">
           <button type="button" class="symbol-btn" data-insert=" + " title="OR">∨ <small>OR</small></button>
           <button type="button" class="symbol-btn" data-insert=" * " title="AND">∧ <small>AND</small></button>
           <button type="button" class="symbol-btn" data-insert="!" title="NOT">¬ <small>NOT</small></button>
-          <button type="button" class="symbol-btn" data-insert=" ⊕ " title="Exclusive OR">⊕ <small>XOR</small></button>
-          <button type="button" class="symbol-btn" data-insert=" ⊙ " title="Exclusive NOR">⊙ <small>XNOR</small></button>
-          <button type="button" class="symbol-btn" data-template="BAR()" data-cursor-back="1" title="ขีดบนทั้งกลุ่ม"><span class="mini-overbar">ABC</span> <small>BAR</small></button>
+          <button type="button" class="symbol-btn" data-insert=" ⊕ " title="XOR">⊕ <small>XOR</small></button>
+          <button type="button" class="symbol-btn" data-insert=" ⊙ " title="XNOR">⊙ <small>XNOR</small></button>
+          <button type="button" class="symbol-btn" data-template="BAR()" data-cursor-back="1" title="Bar"><span class="mini-overbar">ABC</span> <small>BAR</small></button>
           <button type="button" class="symbol-btn" data-template="()" data-cursor-back="1" title="วงเล็บ">( )</button>
         </div>
 
-        <div class="notation">
-          <span><code>+</code> / <code>∨</code> OR</span>
-          <span><code>*</code> / <code>·</code> / <code>.</code> / <code>∧</code> AND</span>
-          <span><code>X'</code> / <code>X̅</code> NOT</span>
-          <span><code>⊕</code> / <code>^</code> XOR</span>
-          <span><code>⊙</code> XNOR</span>
-        </div>
+        <div class="source-divider"><span>หรือใช้รูป</span></div>
 
-        <div class="variable-note">
-          <strong>ตัวแปรไม่ล็อก A/B:</strong>
-          ใช้ <code>X</code>, <code>Y</code>, <code>Z</code>, <code>Q1</code>, <code>Sensor</code>, <code>Input_A</code> ได้เลย และถ้าต้องการชื่อพิมพ์ใหญ่หลายตัว เช่น INPUT ให้เขียน <code>[INPUT]</code><br>
-          พิมพ์แบบโจทย์ได้ด้วย เช่น <code>Z = A.B + A.B'</code> — โปรแกรมจะเก็บ <code>Z =</code> ไว้ในคำตอบและย่อเฉพาะด้านขวา
-        </div>
-
-        <div class="divider"><span>หรือ</span></div>
-
-        <div class="image-source-card">
-          <div class="image-source-head">
-            <span class="upload-icon">⌁</span>
-            <div>
-              <strong>ใช้รูปสมการ</strong>
-              <small>เลือกว่าจะใช้รูปที่มีอยู่ หรือเปิดกล้องถ่ายใหม่</small>
-            </div>
-          </div>
-          <div class="image-source-actions">
-            <label class="image-source-btn" for="imageInput">
-              <input id="imageInput" type="file" accept="image/*" />
-              <span aria-hidden="true">▣</span>
-              <span><strong>เลือกรูป</strong><small>จากเครื่อง / Photos</small></span>
-            </label>
-            <label class="image-source-btn" for="cameraInput">
-              <input id="cameraInput" type="file" accept="image/*" capture="environment" />
-              <span aria-hidden="true">◉</span>
-              <span><strong>ถ่ายรูป</strong><small>เปิดกล้องด้านหลัง</small></span>
-            </label>
-          </div>
-          <p class="image-support-note">OCR เหมาะกับ <strong>รูปสมการ Boolean</strong> และโจทย์หลายบรรทัด ส่วนรูปวงจร Logic Gate ยังไม่สามารถแปลงเส้นวงจรเป็นสูตรอัตโนมัติได้</p>
+        <div class="image-source-actions clean-image-actions">
+          <label class="image-source-btn" for="imageInput">
+            <input id="imageInput" type="file" accept="image/*" />
+            <span aria-hidden="true">▣</span>
+            <span><strong>เลือกรูป</strong><small>Photos / Files</small></span>
+          </label>
+          <label class="image-source-btn" for="cameraInput">
+            <input id="cameraInput" type="file" accept="image/*" capture="environment" />
+            <span aria-hidden="true">◉</span>
+            <span><strong>ถ่ายรูป</strong><small>Camera</small></span>
+          </label>
         </div>
 
         <div id="previewWrap" class="preview-wrap" hidden>
           <img id="preview" alt="ภาพสมการที่เลือก" />
           <div class="ocr-row">
             <div class="ocr-info">
-              <strong>OCR + BAR DETECTOR <span class="beta-pill">BETA</span></strong>
+              <strong>OCR <span class="beta-pill">BETA</span></strong>
               <span id="ocrStatus">ยังไม่ได้เลือกรูป</span>
               <div class="progress-track" aria-hidden="true"><div id="ocrProgress" class="progress-bar"></div></div>
             </div>
-            <button id="ocrBtn" class="secondary-btn" type="button" disabled>อ่านข้อความจากรูป</button>
+            <button id="ocrBtn" class="secondary-btn" type="button" disabled>อ่านข้อความ</button>
           </div>
         </div>
 
         <div id="errorBox" class="error" role="alert" hidden></div>
 
-        <div class="actions">
+        <div class="actions compact-actions">
           <button id="simplifyBtn" class="primary-btn" type="button">ย่อสมการ</button>
-          <button id="clearBtn" class="ghost-btn" type="button">ล้างทั้งหมด</button>
+          <button id="clearBtn" class="ghost-btn" type="button">ล้าง</button>
         </div>
-        <p class="shortcut">บนคอมกด <kbd>Ctrl</kbd> + <kbd>Enter</kbd> เพื่อย่อได้ทันที</p>
       </article>
 
-      <article class="card result-card">
-        <span class="eyebrow">RESULT</span>
-        <h2>ผลลัพธ์</h2>
+      <article class="card result-card compact-result-card">
+        <div class="result-topline">
+          <span class="eyebrow">RESULT</span>
+          <a class="tiny-doc-link" href="docs.html">ดูคู่มือ →</a>
+        </div>
 
         <div class="empty-state" id="emptyState">
           <div class="logic-mark">01</div>
-          <p>ใส่สูตรหรืออ่านข้อความจากรูป แล้วกด <strong>ย่อสมการ</strong></p>
+          <p>ผลลัพธ์จะแสดงที่นี่</p>
         </div>
 
         <div id="resultBox" hidden>
-          <div class="result-label">สมการที่ย่อแล้ว</div>
+          <div class="result-label">คำตอบ</div>
           <div id="resultFormula" class="result-formula"></div>
 
           <div class="normalized-block">
-            <span>โปรแกรมตีความสูตรเป็น</span>
+            <span>ตีความเป็น</span>
             <code id="normalizedFormula"></code>
           </div>
 
           <div id="resultMeta" class="result-meta"></div>
-
-          <div class="method-note">
-            <strong>วิธีที่ใช้</strong>
-            <p>สร้าง Truth Table → หา minterm → Quine–McCluskey → เลือกชุด Prime Implicant ที่ใช้จำนวนพจน์น้อยที่สุด และใช้ literal น้อยกว่าเมื่อจำนวนพจน์เท่ากัน</p>
-          </div>
         </div>
 
         <div id="batchResults" class="batch-results" hidden></div>
       </article>
     </section>
-
-    <section class="card quick-doc-card">
-      <div>
-        <span class="eyebrow">DOCUMENTATION</span>
-        <h2>ดูวิธีใช้และสัญลักษณ์ทั้งหมด</h2>
-        <p>ย้ายคู่มือออกเป็นหน้าแยกแล้ว: มี BAR, XOR/XNOR, ตัวแปรตั้งชื่อเอง, OCR หลายข้อ, ข้อจำกัดของรูป และตัวอย่างทดสอบจากวงจร Logic Gate</p>
-      </div>
-      <a class="primary-link" href="docs.html">เปิดคู่มือการใช้งาน →</a>
-    </section>
-
-    <footer>
-      <span>Boolean Simplifier</span>
-      <span>ทำงานในเบราว์เซอร์ • ไม่ต้องส่งรูปไปยังเซิร์ฟเวอร์ของโปรเจกต์</span>
-    </footer>
   </main>
 </body>
 </html>
