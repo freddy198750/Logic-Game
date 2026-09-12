@@ -8,13 +8,14 @@
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
   <script src="app.js" defer></script>
+  <script src="v3.js" defer></script>
 </head>
 <body>
   <main class="shell">
     <header class="hero">
       <div class="badge">Boolean Logic • OCR • BAR • XOR</div>
       <h1>Boolean Simplifier</h1>
-      <p>พิมพ์สูตร หรือแนบรูปสมการ แล้วให้เว็บช่วยอ่านและย่อให้อยู่ในรูป SOP ที่สั้นลง พร้อมรองรับสัญลักษณ์ Boolean หลายรูปแบบ</p>
+      <p>พิมพ์สูตร หรือแนบรูปสมการ แล้วให้เว็บช่วยอ่าน Bar จากตำแหน่งในภาพ แยกหลายข้อ และย่อให้อยู่ในรูป SOP ที่สั้นลง</p>
     </header>
 
     <section class="grid">
@@ -28,7 +29,7 @@
         </div>
 
         <label for="formulaInput">สูตร Boolean</label>
-        <textarea id="formulaInput" rows="5" spellcheck="false" autocomplete="off" placeholder="เช่น X⊕Y, BAR(X+Y), Sensor*Enable + Sensor*Enable'"></textarea>
+        <textarea id="formulaInput" rows="5" spellcheck="false" autocomplete="off" placeholder="เช่น X = A.B + A.B', X⊕Y, BAR(X+Y)"></textarea>
 
         <div class="symbol-toolbar" aria-label="แทรกสัญลักษณ์ Boolean">
           <button type="button" class="symbol-btn" data-insert=" + " title="OR">∨ <small>OR</small></button>
@@ -42,7 +43,7 @@
 
         <div class="notation">
           <span><code>+</code> / <code>∨</code> OR</span>
-          <span><code>*</code> / <code>∧</code> AND</span>
+          <span><code>*</code> / <code>·</code> / <code>.</code> / <code>∧</code> AND</span>
           <span><code>X'</code> / <code>X̅</code> NOT</span>
           <span><code>⊕</code> / <code>^</code> XOR</span>
           <span><code>⊙</code> XNOR</span>
@@ -50,7 +51,8 @@
 
         <div class="variable-note">
           <strong>ตัวแปรไม่ล็อก A/B:</strong>
-          ใช้ <code>X</code>, <code>Y</code>, <code>Z</code>, <code>Q1</code>, <code>Sensor</code>, <code>Input_A</code> ได้เลย และถ้าต้องการชื่อพิมพ์ใหญ่หลายตัว เช่น INPUT ให้เขียน <code>[INPUT]</code>
+          ใช้ <code>X</code>, <code>Y</code>, <code>Z</code>, <code>Q1</code>, <code>Sensor</code>, <code>Input_A</code> ได้เลย และถ้าต้องการชื่อพิมพ์ใหญ่หลายตัว เช่น INPUT ให้เขียน <code>[INPUT]</code><br>
+          พิมพ์แบบโจทย์ได้ด้วย เช่น <code>Z = A.B + A.B'</code> — โปรแกรมจะเก็บ <code>Z =</code> ไว้ในคำตอบและย่อเฉพาะด้านขวา
         </div>
 
         <div class="divider"><span>หรือ</span></div>
@@ -59,14 +61,14 @@
           <input id="imageInput" type="file" accept="image/*" capture="environment" />
           <span class="upload-icon">⌁</span>
           <strong>แนบรูปสมการ</strong>
-          <small>รองรับ JPG, PNG และรูปจากกล้องมือถือ</small>
+          <small>รองรับ JPG, PNG, รูปจากกล้องมือถือ และรูปที่มีหลายข้อ</small>
         </label>
 
         <div id="previewWrap" class="preview-wrap" hidden>
           <img id="preview" alt="ภาพสมการที่เลือก" />
           <div class="ocr-row">
             <div class="ocr-info">
-              <strong>OCR</strong>
+              <strong>OCR + BAR DETECTOR <span class="beta-pill">BETA</span></strong>
               <span id="ocrStatus">ยังไม่ได้เลือกรูป</span>
               <div class="progress-track" aria-hidden="true"><div id="ocrProgress" class="progress-bar"></div></div>
             </div>
@@ -108,6 +110,8 @@
             <p>สร้าง Truth Table → หา minterm → Quine–McCluskey → เลือกชุด Prime Implicant ที่ใช้จำนวนพจน์น้อยที่สุด และใช้ literal น้อยกว่าเมื่อจำนวนพจน์เท่ากัน</p>
           </div>
         </div>
+
+        <div id="batchResults" class="batch-results" hidden></div>
       </article>
     </section>
 
@@ -148,6 +152,7 @@
 
       <h2 class="example-heading">ตัวอย่างการย่อ</h2>
       <div class="example-list">
+        <div><code>Z = A.B + A.B'</code><span>→</span><strong>Z = A</strong></div>
         <div><code>CD + CD'</code><span>→</span><strong>C</strong></div>
         <div><code>X ⊕ Y</code><span>→</span><strong>X'·Y + X·Y'</strong></div>
         <div><code>BAR(X+Y)</code><span>→</span><strong>X'·Y'</strong></div>
@@ -155,7 +160,11 @@
         <div><code>[INPUT]*Q1 + [INPUT]*Q1'</code><span>→</span><strong>[INPUT]</strong></div>
       </div>
 
-      <p class="help-note">รองรับได้สูงสุด 8 ตัวแปรต่อสูตร เพื่อให้การสร้าง Truth Table และการย่อทำงานเร็วในเบราว์เซอร์ รูปที่พิมพ์หรือเขียนชัดจะ OCR ได้ดีที่สุด โดยเฉพาะเส้น Bar จากลายมืออาจถูก OCR มองข้าม จึงมีปุ่ม BAR ให้กดเพิ่มหรือแก้สูตรก่อนย่อได้</p>
+      <div class="ocr-feature-note">
+        <strong>OCR เวอร์ชันใหม่:</strong>
+        โปรแกรมขอข้อมูลตำแหน่งตัวอักษรจาก Tesseract แล้วสแกนพิกเซลหาเส้นแนวนอนที่อยู่เหนืออักขระ เพื่อแปลงเป็น <code>BAR(...)</code> อัตโนมัติ รวมถึงพยายามรักษา Bar ซ้อนกัน และแยกโจทย์หลายบรรทัดเป็นหลายข้อ
+      </div>
+      <p class="help-note">รองรับสูงสุด 8 ตัวแปรต่อหนึ่งสมการ การตรวจ Bar จากรูปเป็น Beta: รูปเอียง เบลอ มีเส้นตาราง หรือ Bar ที่ติดกับตัวอักษรมากอาจตรวจผิดได้ จึงควรตรวจข้อความในช่องสูตรก่อนกดย่อเสมอ หากรูปมีหลายข้อสามารถกดย่อทั้งหมดพร้อมกันได้แล้ว</p>
     </section>
 
     <footer>
