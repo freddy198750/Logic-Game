@@ -3,17 +3,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Boolean Simplifier — พิมพ์สูตรหรือใช้รูปเพื่อย่อสมการ Boolean" />
+  <meta name="description" content="Boolean Simplifier — พิมพ์สูตร ใช้รูปสมการ หรือวิเคราะห์วงจร Logic Gate" />
   <title>Boolean Simplifier</title>
-  <link rel="stylesheet" href="styles.css?v=6" />
-  <link rel="stylesheet" href="v3.css?v=6" />
-  <link rel="stylesheet" href="v4.css?v=6" />
-  <link rel="stylesheet" href="v5.css?v=6" />
-  <link rel="stylesheet" href="v6.css?v=6" />
+  <link rel="stylesheet" href="styles.css?v=7" />
+  <link rel="stylesheet" href="v3.css?v=7" />
+  <link rel="stylesheet" href="v4.css?v=7" />
+  <link rel="stylesheet" href="v5.css?v=7" />
+  <link rel="stylesheet" href="v6.css?v=7" />
+  <link rel="stylesheet" href="circuit.css?v=7" />
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
-  <script src="app.js?v=6" defer></script>
-  <script src="v3.js?v=6" defer></script>
-  <script src="v4.js?v=6" defer></script>
+  <script src="app.js?v=7" defer></script>
+  <script src="v3.js?v=7" defer></script>
+  <script src="v4.js?v=7" defer></script>
+  <script src="circuit.js?v=7" defer></script>
 </head>
 <body>
   <main class="shell calculator-shell">
@@ -61,14 +63,17 @@
         </div>
 
         <div id="previewWrap" class="preview-wrap" hidden>
-          <img id="preview" alt="ภาพสมการที่เลือก" />
+          <img id="preview" alt="ภาพที่เลือก" />
           <div class="ocr-row">
             <div class="ocr-info">
-              <strong>OCR <span class="beta-pill">BETA</span></strong>
+              <strong>IMAGE <span class="beta-pill">BETA</span></strong>
               <span id="ocrStatus">ยังไม่ได้เลือกรูป</span>
               <div class="progress-track" aria-hidden="true"><div id="ocrProgress" class="progress-bar"></div></div>
             </div>
-            <button id="ocrBtn" class="secondary-btn" type="button" disabled>อ่านข้อความ</button>
+            <div class="ocr-actions">
+              <button id="ocrBtn" class="secondary-btn" type="button" disabled>อ่านข้อความ</button>
+              <button id="circuitBtn" class="secondary-btn circuit-btn" type="button" disabled>วิเคราะห์วงจร</button>
+            </div>
           </div>
         </div>
 
