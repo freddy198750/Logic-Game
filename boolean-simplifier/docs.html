@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="คู่มือ Boolean Simplifier: syntax, BAR, XOR, XNOR, OCR และตัวอย่างการใช้งาน" />
+  <meta name="description" content="คู่มือ Boolean Simplifier: syntax, BAR, XOR, XNOR, OCR และ Circuit Analyzer" />
   <title>คู่มือ — Boolean Simplifier</title>
-  <link rel="stylesheet" href="styles.css?v=6" />
-  <link rel="stylesheet" href="v3.css?v=6" />
-  <link rel="stylesheet" href="v4.css?v=6" />
-  <link rel="stylesheet" href="v6.css?v=6" />
+  <link rel="stylesheet" href="styles.css?v=8" />
+  <link rel="stylesheet" href="v3.css?v=8" />
+  <link rel="stylesheet" href="v4.css?v=8" />
+  <link rel="stylesheet" href="v6.css?v=8" />
 </head>
 <body>
   <main class="shell docs-shell">
@@ -44,8 +44,8 @@
           <h2>เริ่มใช้งาน</h2>
           <ol class="doc-steps">
             <li>ไปหน้า <a href="./">คำนวณ</a> แล้วพิมพ์สูตร หรือเลือก <strong>เลือกรูป</strong> / <strong>ถ่ายรูป</strong></li>
-            <li>ถ้าใช้รูป ให้กด <strong>อ่านข้อความ</strong> และตรวจสูตรที่ OCR อ่าน โดยเฉพาะ Bar</li>
-            <li>กด <strong>ย่อสมการ</strong> เพื่อหา Minimal SOP</li>
+            <li>รูปสมการให้กด <strong>อ่านข้อความ</strong>; รูป Logic Gate ให้กด <strong>วิเคราะห์วงจร</strong></li>
+            <li>สูตรที่พิมพ์หรือ OCR แล้วกด <strong>ย่อสมการ</strong> เพื่อหา Minimal SOP</li>
           </ol>
           <div class="doc-example"><code>A*B + A*B'</code><span>→</span><strong>A</strong></div>
         </section>
@@ -77,14 +77,14 @@
         </section>
 
         <section id="images" class="card doc-section">
-          <span class="eyebrow">04 • IMAGE OCR</span>
+          <span class="eyebrow">04 • IMAGE</span>
           <h2>รูปและกล้อง</h2>
           <div class="doc-choice-grid">
             <div><strong>▣ เลือกรูป</strong><p>เลือก JPG/PNG จาก Photos หรือ Files</p></div>
             <div><strong>◉ ถ่ายรูป</strong><p>เปิดกล้องด้านหลังบนมือถือเพื่อถ่ายโจทย์ใหม่</p></div>
           </div>
-          <p>OCR อ่านตัวอักษรและมี Bar Detector (Beta) ที่พยายามตรวจเส้น Bar จากตำแหน่งในภาพ</p>
-          <div class="notice warning"><strong>ควรตรวจสูตรก่อนย่อ:</strong> ภาพเบลอ เอียง มีเส้นตาราง หรือ Bar ซ้อนอาจอ่านคลาดเคลื่อนได้</div>
+          <p><strong>อ่านข้อความ</strong> ใช้กับรูปสมการ Boolean ส่วน <strong>วิเคราะห์วงจร</strong> ใช้กับภาพ Logic Gate Diagram</p>
+          <div class="notice warning"><strong>โหมดรูปยังเป็น Beta:</strong> ภาพที่คม ตรง พื้นหลังเรียบ และสายส่วนใหญ่แนวนอน/แนวตั้งจะอ่านได้ดีที่สุด</div>
         </section>
 
         <section id="multi" class="card doc-section">
@@ -97,9 +97,10 @@
         </section>
 
         <section id="circuit-test" class="card doc-section">
-          <span class="eyebrow">06 • CIRCUIT</span>
-          <h2>Logic Gate</h2>
-          <p>ตัว Simplifier คำนวณสูตรที่ถอดจากวงจรได้ แต่ตอนนี้ยังไม่แปลงภาพ Gate Diagram เป็นสูตรอัตโนมัติ</p>
+          <span class="eyebrow">06 • CIRCUIT BETA</span>
+          <h2>Logic Gate Diagram</h2>
+          <p>เลือกภาพวงจรแล้วกด <strong>วิเคราะห์วงจร</strong> โปรแกรมจะพยายามหา Gate, ตามสาย, แยกจุดต่อกับจุดตัด และสร้างสมการเอาต์พุตก่อนส่งไปยัง Boolean Simplifier</p>
+          <p>เวอร์ชันนี้เน้นภาพตำรา/สแกนที่ใช้ <strong>NOT, AND, OR, XOR</strong> และสายชัดเจน</p>
           <div class="circuit-results">
             <div><code>T1 = X'Y</code><strong>T1 = X'·Y</strong></div>
             <div><code>T2 = W'X</code><strong>T2 = W'·X</strong></div>
@@ -117,7 +118,7 @@
             <li>สูงสุด 8 ตัวแปรต่อหนึ่งสมการ</li>
             <li>คำตอบหลักเป็น Minimal SOP</li>
             <li>Bar Detector ยังเป็น Beta</li>
-            <li>ยังไม่อ่าน Logic Gate Diagram เป็นสูตรอัตโนมัติ</li>
+            <li>Circuit Analyzer ยังเป็น Beta และเน้น NOT/AND/OR/XOR; รูปเอียง ลายมือ เส้นโค้งมาก หรือ NAND/NOR/XNOR อาจยังอ่านผิด</li>
           </ul>
         </section>
       </article>
