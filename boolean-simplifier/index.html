@@ -7,12 +7,22 @@
   <title>Boolean Simplifier — ย่อสมการจากสูตรหรือรูป</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="v3.css" />
+  <link rel="stylesheet" href="v4.css" />
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
   <script src="app.js" defer></script>
   <script src="v3.js" defer></script>
+  <script src="v4.js" defer></script>
 </head>
 <body>
   <main class="shell">
+    <nav class="top-nav" aria-label="เมนูหลัก">
+      <a class="brand-link" href="./">Boolean Simplifier</a>
+      <div class="nav-tabs">
+        <a class="nav-tab active" href="./" aria-current="page">คำนวณ</a>
+        <a class="nav-tab" href="docs.html">คู่มือการใช้งาน</a>
+      </div>
+    </nav>
+
     <header class="hero">
       <div class="badge">Boolean Logic • OCR • BAR • XOR</div>
       <h1>Boolean Simplifier</h1>
@@ -58,12 +68,28 @@
 
         <div class="divider"><span>หรือ</span></div>
 
-        <label class="upload-zone" for="imageInput">
-          <input id="imageInput" type="file" accept="image/*" capture="environment" />
-          <span class="upload-icon">⌁</span>
-          <strong>แนบรูปสมการ</strong>
-          <small>รองรับ JPG, PNG, รูปจากกล้องมือถือ และรูปที่มีหลายข้อ</small>
-        </label>
+        <div class="image-source-card">
+          <div class="image-source-head">
+            <span class="upload-icon">⌁</span>
+            <div>
+              <strong>ใช้รูปสมการ</strong>
+              <small>เลือกว่าจะใช้รูปที่มีอยู่ หรือเปิดกล้องถ่ายใหม่</small>
+            </div>
+          </div>
+          <div class="image-source-actions">
+            <label class="image-source-btn" for="imageInput">
+              <input id="imageInput" type="file" accept="image/*" />
+              <span aria-hidden="true">▣</span>
+              <span><strong>เลือกรูป</strong><small>จากเครื่อง / Photos</small></span>
+            </label>
+            <label class="image-source-btn" for="cameraInput">
+              <input id="cameraInput" type="file" accept="image/*" capture="environment" />
+              <span aria-hidden="true">◉</span>
+              <span><strong>ถ่ายรูป</strong><small>เปิดกล้องด้านหลัง</small></span>
+            </label>
+          </div>
+          <p class="image-support-note">OCR เหมาะกับ <strong>รูปสมการ Boolean</strong> และโจทย์หลายบรรทัด ส่วนรูปวงจร Logic Gate ยังไม่สามารถแปลงเส้นวงจรเป็นสูตรอัตโนมัติได้</p>
+        </div>
 
         <div id="previewWrap" class="preview-wrap" hidden>
           <img id="preview" alt="ภาพสมการที่เลือก" />
@@ -116,56 +142,13 @@
       </article>
     </section>
 
-    <section class="card help-card">
-      <div class="help-title-row">
-        <div>
-          <span class="eyebrow">SYNTAX</span>
-          <h2>สัญลักษณ์พิเศษใส่ยังไง</h2>
-        </div>
+    <section class="card quick-doc-card">
+      <div>
+        <span class="eyebrow">DOCUMENTATION</span>
+        <h2>ดูวิธีใช้และสัญลักษณ์ทั้งหมด</h2>
+        <p>ย้ายคู่มือออกเป็นหน้าแยกแล้ว: มี BAR, XOR/XNOR, ตัวแปรตั้งชื่อเอง, OCR หลายข้อ, ข้อจำกัดของรูป และตัวอย่างทดสอบจากวงจร Logic Gate</p>
       </div>
-
-      <div class="syntax-grid">
-        <div class="syntax-item">
-          <div class="syntax-symbol"><span class="overbar">X</span></div>
-          <strong>NOT / Bar ตัวเดียว</strong>
-          <code>X̅</code>
-          <span>หรือ <code>X'</code>, <code>!X</code>, <code>¬X</code></span>
-        </div>
-        <div class="syntax-item">
-          <div class="syntax-symbol"><span class="overbar">X + Y</span></div>
-          <strong>Bar ยาวครอบทั้งกลุ่ม</strong>
-          <code>BAR(X+Y)</code>
-          <span>เหมือน <code>(X+Y)'</code></span>
-        </div>
-        <div class="syntax-item">
-          <div class="syntax-symbol">X ⊕ Y</div>
-          <strong>Exclusive OR</strong>
-          <code>X ⊕ Y</code>
-          <span>หรือ <code>X ^ Y</code>, <code>X XOR Y</code></span>
-        </div>
-        <div class="syntax-item">
-          <div class="syntax-symbol">X ⊙ Y</div>
-          <strong>Exclusive NOR</strong>
-          <code>X ⊙ Y</code>
-          <span>หรือ <code>X XNOR Y</code></span>
-        </div>
-      </div>
-
-      <h2 class="example-heading">ตัวอย่างการย่อ</h2>
-      <div class="example-list">
-        <div><code>Z = A.B + A.B'</code><span>→</span><strong>Z = A</strong></div>
-        <div><code>CD + CD'</code><span>→</span><strong>C</strong></div>
-        <div><code>X ⊕ Y</code><span>→</span><strong>X'·Y + X·Y'</strong></div>
-        <div><code>BAR(X+Y)</code><span>→</span><strong>X'·Y'</strong></div>
-        <div><code>Sensor*Enable + Sensor*Enable'</code><span>→</span><strong>Sensor</strong></div>
-        <div><code>[INPUT]*Q1 + [INPUT]*Q1'</code><span>→</span><strong>[INPUT]</strong></div>
-      </div>
-
-      <div class="ocr-feature-note">
-        <strong>OCR เวอร์ชันใหม่:</strong>
-        โปรแกรมขอข้อมูลตำแหน่งตัวอักษรจาก Tesseract แล้วสแกนพิกเซลหาเส้นแนวนอนที่อยู่เหนืออักขระ เพื่อแปลงเป็น <code>BAR(...)</code> อัตโนมัติ รวมถึงพยายามรักษา Bar ซ้อนกัน และแยกโจทย์หลายบรรทัดเป็นหลายข้อ
-      </div>
-      <p class="help-note">รองรับสูงสุด 8 ตัวแปรต่อหนึ่งสมการ การตรวจ Bar จากรูปเป็น Beta: รูปเอียง เบลอ มีเส้นตาราง หรือ Bar ที่ติดกับตัวอักษรมากอาจตรวจผิดได้ จึงควรตรวจข้อความในช่องสูตรก่อนกดย่อเสมอ หากรูปมีหลายข้อสามารถกดย่อทั้งหมดพร้อมกันได้แล้ว</p>
+      <a class="primary-link" href="docs.html">เปิดคู่มือการใช้งาน →</a>
     </section>
 
     <footer>
