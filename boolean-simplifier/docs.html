@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="คู่มือ Boolean Simplifier: syntax, BAR, XOR, XNOR, OCR และตัวอย่างการใช้งาน" />
+  <title>คู่มือ — Boolean Simplifier</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="v3.css" />
+  <link rel="stylesheet" href="v4.css" />
+</head>
+<body>
+  <main class="shell docs-shell">
+    <nav class="top-nav" aria-label="เมนูหลัก">
+      <a class="brand-link" href="./">Boolean Simplifier</a>
+      <div class="nav-tabs">
+        <a class="nav-tab" href="./">คำนวณ</a>
+        <a class="nav-tab active" href="docs.html" aria-current="page">คู่มือการใช้งาน</a>
+      </div>
+    </nav>
+
+    <header class="hero docs-hero">
+      <div class="badge">DOCUMENTATION • V3</div>
+      <h1>คู่มือการใช้งาน</h1>
+      <p>วิธีพิมพ์สมการ ใช้ Bar/XOR/XNOR อ่านจากรูป และเข้าใจว่ารูปแบบไหนที่ OCR รองรับในตอนนี้</p>
+    </header>
+
+    <div class="docs-layout">
+      <aside class="card docs-toc">
+        <strong>หัวข้อ</strong>
+        <a href="#start">เริ่มใช้งาน</a>
+        <a href="#syntax">สัญลักษณ์</a>
+        <a href="#variables">ตัวแปร</a>
+        <a href="#images">รูปและกล้อง</a>
+        <a href="#multi">หลายข้อในรูปเดียว</a>
+        <a href="#circuit-test">ทดสอบรูปวงจร</a>
+        <a href="#limits">ข้อจำกัด</a>
+      </aside>
+
+      <article class="docs-content">
+        <section id="start" class="card doc-section">
+          <span class="eyebrow">01 • START</span>
+          <h2>เริ่มใช้งาน</h2>
+          <ol class="doc-steps">
+            <li>ไปหน้า <a href="./">คำนวณ</a> แล้วพิมพ์สูตร หรือเลือก <strong>เลือกรูป</strong> / <strong>ถ่ายรูป</strong></li>
+            <li>ถ้าใช้รูป ให้กด <strong>อ่านข้อความจากรูป</strong> และตรวจข้อความที่ OCR อ่าน โดยเฉพาะ Bar</li>
+            <li>กด <strong>ย่อสมการ</strong> โปรแกรมจะสร้าง Truth Table และหา Minimal SOP</li>
+          </ol>
+          <div class="doc-example"><code>A*B + A*B'</code><span>→</span><strong>A</strong></div>
+        </section>
+
+        <section id="syntax" class="card doc-section">
+          <span class="eyebrow">02 • SYNTAX</span>
+          <h2>สัญลักษณ์ที่รองรับ</h2>
+          <div class="doc-table-wrap"><table class="doc-table">
+            <thead><tr><th>ความหมาย</th><th>พิมพ์ได้</th><th>ตัวอย่าง</th></tr></thead>
+            <tbody>
+              <tr><td>AND</td><td><code>*</code> <code>.</code> <code>·</code> <code>∧</code> หรือเขียนติดกัน</td><td><code>A.B</code>, <code>AB</code></td></tr>
+              <tr><td>OR</td><td><code>+</code> <code>∨</code></td><td><code>A+B</code></td></tr>
+              <tr><td>NOT ตัวเดียว</td><td><code>A'</code> <code>A̅</code> <code>!A</code> <code>¬A</code></td><td><span class="overbar">A</span></td></tr>
+              <tr><td>Bar ครอบกลุ่ม</td><td><code>BAR(A+B)</code> หรือ <code>(A+B)'</code></td><td><span class="overbar">A+B</span></td></tr>
+              <tr><td>XOR</td><td><code>⊕</code> <code>^</code> หรือ <code>XOR</code></td><td><code>A⊕B</code></td></tr>
+              <tr><td>XNOR</td><td><code>⊙</code> หรือ <code>XNOR</code></td><td><code>A⊙B</code></td></tr>
+            </tbody>
+          </table></div>
+        </section>
+
+        <section id="variables" class="card doc-section">
+          <span class="eyebrow">03 • VARIABLES</span>
+          <h2>ตัวแปรไม่ล็อก A/B</h2>
+          <p>ใช้ชื่ออย่าง <code>W</code>, <code>X</code>, <code>Q1</code>, <code>Sensor</code>, <code>Input_A</code> ได้ และถ้าต้องการชื่อพิมพ์ใหญ่หลายตัวให้ครอบด้วย <code>[ ]</code> เช่น <code>[INPUT]</code></p>
+          <div class="doc-example"><code>[INPUT]*Enable + [INPUT]*Enable'</code><span>→</span><strong>[INPUT]</strong></div>
+          <p>ใส่ชื่อเอาต์พุตได้ด้วย เช่น <code>F1 = A+B</code> โปรแกรมจะย่อเฉพาะด้านขวาและเก็บ <code>F1 =</code> ไว้</p>
+        </section>
+
+        <section id="images" class="card doc-section">
+          <span class="eyebrow">04 • IMAGE OCR</span>
+          <h2>เลือกรูปกับถ่ายรูปแยกกัน</h2>
+          <div class="doc-choice-grid">
+            <div><strong>▣ เลือกรูป</strong><p>เลือก JPG/PNG/ภาพจาก Photos หรือ Files โดยไม่บังคับเปิดกล้อง</p></div>
+            <div><strong>◉ ถ่ายรูป</strong><p>บนมือถือจะขอเปิดกล้องด้านหลังเพื่อถ่ายโจทย์ใหม่</p></div>
+          </div>
+          <p>OCR ใช้ Tesseract อ่านตัวอักษร และมี Bar Detector (Beta) ที่ใช้ตำแหน่งตัวอักษรกับเส้นแนวนอนในภาพเพื่อพยายามสร้าง <code>BAR(...)</code></p>
+          <div class="notice warning"><strong>สำคัญ:</strong> ตรวจสูตรที่ OCR อ่านก่อนย่อเสมอ โดยเฉพาะภาพเบลอ เอียง มีเส้นตาราง หรือ Bar ซ้อนหลายชั้น</div>
+        </section>
+
+        <section id="multi" class="card doc-section">
+          <span class="eyebrow">05 • BATCH</span>
+          <h2>หลายข้อในรูปเดียว</h2>
+          <p>ถ้า OCR อ่านออกมาเป็นหลายบรรทัด เช่น <code>1. X=...</code>, <code>2. Z=...</code> โปรแกรมจะแยกแต่ละข้อและแสดงผลเป็นรายการ</p>
+          <pre class="doc-code">1. X = AB + AB'
+2. Z = A + A'
+3. Y = BAR(A+B)</pre>
+        </section>
+
+        <section id="circuit-test" class="card doc-section">
+          <span class="eyebrow">06 • CIRCUIT TEST</span>
+          <h2>ทดสอบกับรูปวงจร Logic Gate</h2>
+          <p>รูปวงจรที่ใช้ทดสอบมีอินพุต <code>w,x,y,z</code> และจุดกลาง <code>T1–T4</code>. ตอนนี้ OCR ของโปรแกรมออกแบบมาสำหรับ <strong>รูปสมการ</strong> จึงยังไม่สามารถตามเส้นและจำแนก Gate จากรูปวงจรอัตโนมัติได้ แต่เมื่อถอดวงจรเป็นสูตรแล้ว ตัว Simplifier คำนวณได้ถูกต้อง:</p>
+          <div class="circuit-results">
+            <div><code>T1 = X'Y</code><strong>T1 = X'·Y</strong></div>
+            <div><code>T2 = W'X</code><strong>T2 = W'·X</strong></div>
+            <div><code>T3 = W + X'Y</code><strong>T3 = W + X'·Y</strong></div>
+            <div><code>T4 = (W'X) XOR Z</code><strong>T4 = X'·Z + W'·X·Z' + W·Z</strong></div>
+            <div><code>F1 = W + X'Y + ((W'X) XOR Z)</code><strong>F1 = W + X'·Y + X'·Z + X·Z'</strong></div>
+            <div><code>F2 = W'X + Z</code><strong>F2 = Z + W'·X</strong></div>
+          </div>
+          <div class="notice"><strong>ผลทดสอบ:</strong> ส่วนย่อสมการผ่านเคสวงจรนี้ แต่การแปลง “ภาพ Gate → สูตร” เป็นฟีเจอร์คนละชุดกับ OCR สมการ และยังไม่ได้เปิดใช้งานในเวอร์ชันนี้</div>
+        </section>
+
+        <section id="limits" class="card doc-section">
+          <span class="eyebrow">07 • LIMITS</span>
+          <h2>ข้อจำกัดปัจจุบัน</h2>
+          <ul class="doc-list">
+            <li>สูงสุด 8 ตัวแปรต่อหนึ่งสมการ เพื่อควบคุมขนาด Truth Table</li>
+            <li>คำตอบหลักเป็น Minimal SOP; รูป factor เช่น <code>A(B+C)</code> อาจไม่ได้สั้นที่สุดในแง่จำนวนตัวอักษร</li>
+            <li>Bar Detector เป็น Beta และอาจผิดเมื่อภาพคุณภาพต่ำ</li>
+            <li>ยังไม่รองรับการอ่าน Logic Gate Diagram เป็นสมการอัตโนมัติ</li>
+          </ul>
+        </section>
+      </article>
+    </div>
+
+    <footer>
+      <span>Boolean Simplifier • Documentation</span>
+      <a href="./">กลับหน้าคำนวณ →</a>
+    </footer>
+  </main>
+</body>
+</html>
