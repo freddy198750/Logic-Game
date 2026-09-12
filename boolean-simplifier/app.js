@@ -18,43 +18,99 @@ const exampleBtn = $("exampleBtn");
 const clearBtn = $("clearBtn");
 
 let selectedImage = null;
+let exampleIndex = 0;
+
+const RESERVED_WORDS = new Set(["AND", "OR", "NOT", "BAR", "XOR", "XNOR"]);
 
 function normalizeVisualSymbols(text) {
-  return text
-    .normalize("NFKC")
-    .replace(/[’‘`´]/g, "'")
+  return String(text ?? "")
+    .normalize("NFKD")
+    .replace(/[’‘`´′]/g, "'")
+    .replace(/[\u0304\u0305]/g, "'")
     .replace(/[¬]/g, "!")
     .replace(/[∧×·∙]/g, "*")
     .replace(/[∨]/g, "+")
     .replace(/[＋]/g, "+")
-    .replace(/[−–—]/g, "-")
-    .replace(/\s+/g, "")
-    .toUpperCase();
+    .replace(/[⊕]/g, "^")
+    .replace(/[⊙≡]/g, "@")
+    .replace(/[−–—]/g, "-");
 }
 
 function cleanOcrText(text) {
   let s = normalizeVisualSymbols(text)
-    .replace(/[^A-Z01+*|&!~'()]/g, "");
+    .replace(/[^A-Za-z0-9_+*|&!~'^@()\[\]\s]/g, " ")
+    .replace(/[\r\n]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 
   s = s.replace(/\|\|+/g, "|");
   return s;
+}
+
+function formatVariable(name) {
+  if (/^[A-Za-z_]\w*$/.test(name) && !RESERVED_WORDS.has(name.toUpperCase()) && !/^[A-Z]{2,}$/.test(name)) {
+    return name;
+  }
+  return `[${name}]`;
 }
 
 function tokenize(input) {
   const s = normalizeVisualSymbols(input);
   const raw = [];
 
-  for (let i = 0; i < s.length; i++) {
+  for (let i = 0; i < s.length;) {
     const ch = s[i];
-    if (/[A-Z]/.test(ch)) raw.push({ type: "VAR", value: ch });
-    else if (ch === "0" || ch === "1") raw.push({ type: "CONST", value: ch });
+
+    if (/\s/.test(ch)) {
+      i++;
+      continue;
+    }
+
+    if (ch === "[") {
+      const end = s.indexOf("]", i + 1);
+      if (end < 0) throw new Error("ตัวแปรแบบ [NAME] ยังไม่มีเครื่องหมาย ] ปิด");
+      const name = s.slice(i + 1, end).trim();
+      if (!name) throw new Error("ชื่อตัวแปรใน [ ] ห้ามว่าง");
+      if (!/^[A-Za-z_][A-Za-z0-9_ ]*$/.test(name)) {
+        throw new Error("ตัวแปรใน [ ] ใช้ได้เฉพาะตัวอักษร ตัวเลข _ และเว้นวรรค");
+      }
+      raw.push({ type: "VAR", value: name });
+      i = end + 1;
+      continue;
+    }
+
+    if (/[A-Za-z_]/.test(ch)) {
+      let j = i + 1;
+      while (j < s.length && /[A-Za-z0-9_]/.test(s[j])) j++;
+      const word = s.slice(i, j);
+      const keyword = word.toUpperCase();
+
+      if (keyword === "AND") raw.push({ type: "AND", value: word });
+      else if (keyword === "OR") raw.push({ type: "OR", value: word });
+      else if (keyword === "NOT" || keyword === "BAR") raw.push({ type: "NOT", value: word });
+      else if (keyword === "XOR") raw.push({ type: "XOR", value: word });
+      else if (keyword === "XNOR") raw.push({ type: "XNOR", value: word });
+      else if (/^[A-Z]{2,}$/.test(word)) {
+        for (const letter of word) raw.push({ type: "VAR", value: letter });
+      } else {
+        raw.push({ type: "VAR", value: word });
+      }
+
+      i = j;
+      continue;
+    }
+
+    if (ch === "0" || ch === "1") raw.push({ type: "CONST", value: ch });
     else if (ch === "+" || ch === "|") raw.push({ type: "OR", value: ch });
     else if (ch === "*" || ch === "&") raw.push({ type: "AND", value: ch });
     else if (ch === "!" || ch === "~") raw.push({ type: "NOT", value: ch });
+    else if (ch === "^") raw.push({ type: "XOR", value: ch });
+    else if (ch === "@") raw.push({ type: "XNOR", value: ch });
     else if (ch === "'") raw.push({ type: "PRIME", value: ch });
     else if (ch === "(") raw.push({ type: "LPAREN", value: ch });
     else if (ch === ")") raw.push({ type: "RPAREN", value: ch });
     else throw new Error(`ไม่รู้จักอักขระ “${ch}”`);
+    i++;
   }
 
   if (!raw.length) throw new Error("กรุณาพิมพ์สูตร Boolean ก่อน");
@@ -86,10 +142,20 @@ function parseBoolean(input) {
   };
 
   function parseOr() {
-    let node = parseAnd();
+    let node = parseXor();
     while (peek()?.type === "OR") {
       take("OR");
-      node = { type: "OR", left: node, right: parseAnd() };
+      node = { type: "OR", left: node, right: parseXor() };
+    }
+    return node;
+  }
+
+  function parseXor() {
+    let node = parseAnd();
+    while (peek()?.type === "XOR" || peek()?.type === "XNOR") {
+      const op = peek().type;
+      take(op);
+      node = { type: op, left: node, right: parseAnd() };
     }
     return node;
   }
@@ -151,7 +217,7 @@ function getVariables(ast, set = new Set()) {
   if (ast.left) getVariables(ast.left, set);
   if (ast.right) getVariables(ast.right, set);
   if (ast.child) getVariables(ast.child, set);
-  return [...set].sort();
+  return [...set].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 }
 
 function evaluate(ast, env) {
@@ -161,24 +227,35 @@ function evaluate(ast, env) {
     case "NOT": return !evaluate(ast.child, env);
     case "AND": return evaluate(ast.left, env) && evaluate(ast.right, env);
     case "OR": return evaluate(ast.left, env) || evaluate(ast.right, env);
+    case "XOR": return evaluate(ast.left, env) !== evaluate(ast.right, env);
+    case "XNOR": return evaluate(ast.left, env) === evaluate(ast.right, env);
     default: throw new Error("AST ไม่ถูกต้อง");
   }
 }
 
 function astToCanonicalText(ast, parentPrecedence = 0) {
-  const precedence = { OR: 1, AND: 2, NOT: 3, VAR: 4, CONST: 4 };
+  const precedence = { OR: 1, XOR: 2, XNOR: 2, AND: 3, NOT: 4, VAR: 5, CONST: 5 };
   let text;
-  if (ast.type === "VAR") text = ast.name;
+
+  if (ast.type === "VAR") text = formatVariable(ast.name);
   else if (ast.type === "CONST") text = ast.value ? "1" : "0";
   else if (ast.type === "NOT") {
     const child = ast.child;
-    const childText = astToCanonicalText(child, precedence.NOT);
-    text = child.type === "VAR" || child.type === "CONST" ? `${childText}'` : `(${astToCanonicalText(child)})'`;
+    if (child.type === "VAR" || child.type === "CONST") {
+      text = `${astToCanonicalText(child, precedence.NOT)}'`;
+    } else {
+      text = `BAR(${astToCanonicalText(child)})`;
+    }
   } else if (ast.type === "AND") {
     text = `${astToCanonicalText(ast.left, precedence.AND)}·${astToCanonicalText(ast.right, precedence.AND)}`;
+  } else if (ast.type === "XOR") {
+    text = `${astToCanonicalText(ast.left, precedence.XOR)} ⊕ ${astToCanonicalText(ast.right, precedence.XOR)}`;
+  } else if (ast.type === "XNOR") {
+    text = `${astToCanonicalText(ast.left, precedence.XNOR)} ⊙ ${astToCanonicalText(ast.right, precedence.XNOR)}`;
   } else if (ast.type === "OR") {
     text = `${astToCanonicalText(ast.left, precedence.OR)} + ${astToCanonicalText(ast.right, precedence.OR)}`;
   }
+
   return precedence[ast.type] < parentPrecedence ? `(${text})` : text;
 }
 
@@ -336,8 +413,9 @@ function chooseMinimumCover(primes, minterms, width) {
 function implicantToText(imp, variables) {
   const parts = [];
   for (let i = 0; i < imp.bits.length; i++) {
-    if (imp.bits[i] === "1") parts.push(variables[i]);
-    if (imp.bits[i] === "0") parts.push(`${variables[i]}'`);
+    const name = formatVariable(variables[i]);
+    if (imp.bits[i] === "1") parts.push(name);
+    if (imp.bits[i] === "0") parts.push(`${name}'`);
   }
   return parts.length ? parts.join("·") : "1";
 }
@@ -397,7 +475,6 @@ function showError(message) {
   errorBox.textContent = message;
   errorBox.hidden = false;
   resultBox.hidden = true;
-  emptyState.hidden = false;
 }
 
 function hideError() {
@@ -408,7 +485,7 @@ function renderResult(data) {
   hideError();
   resultFormula.textContent = data.result;
   normalizedFormula.textContent = data.normalized;
-  const vars = data.variables.length ? data.variables.join(", ") : "ไม่มี";
+  const vars = data.variables.length ? data.variables.map(formatVariable).join(", ") : "ไม่มี";
   const mins = data.minterms.length <= 24 ? data.minterms.join(", ") : `${data.minterms.slice(0, 24).join(", ")} …`;
   resultMeta.innerHTML = `
     <span>ตัวแปร: <strong>${vars}</strong></span>
@@ -427,6 +504,25 @@ function runSimplify() {
   } catch (err) {
     showError(err.message || String(err));
   }
+}
+
+function insertIntoFormula(text, cursorBack = 0) {
+  const start = formulaInput.selectionStart ?? formulaInput.value.length;
+  const end = formulaInput.selectionEnd ?? start;
+  formulaInput.value = formulaInput.value.slice(0, start) + text + formulaInput.value.slice(end);
+  const cursor = start + text.length - cursorBack;
+  formulaInput.focus();
+  formulaInput.setSelectionRange?.(cursor, cursor);
+}
+
+if (document.querySelectorAll) {
+  document.querySelectorAll(".symbol-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      const text = button.dataset.template || button.dataset.insert || "";
+      const cursorBack = Number(button.dataset.cursorBack || 0);
+      insertIntoFormula(text, cursorBack);
+    });
+  });
 }
 
 imageInput.addEventListener("change", () => {
@@ -467,7 +563,7 @@ ocrBtn.addEventListener("click", async () => {
     const cleaned = cleanOcrText(raw);
     formulaInput.value = cleaned || raw;
     ocrStatus.textContent = cleaned
-      ? "อ่านเสร็จแล้ว — ตรวจสูตรในช่องก่อนกดย่อ"
+      ? "อ่านเสร็จแล้ว — ตรวจสูตร โดยเฉพาะ Bar/prime ก่อนกดย่อ"
       : "อ่านได้บางส่วน — กรุณาแก้สูตรในช่องข้อความ";
     ocrProgress.style.width = "100%";
     formulaInput.focus();
@@ -485,8 +581,17 @@ formulaInput.addEventListener("keydown", (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key === "Enter") runSimplify();
 });
 
+const examples = [
+  "CD + CD'",
+  "X ⊕ Y",
+  "BAR(X+Y)",
+  "Sensor*Enable + Sensor*Enable'",
+  "[INPUT]*Q1 + [INPUT]*Q1'"
+];
+
 exampleBtn.addEventListener("click", () => {
-  formulaInput.value = "A*B + A*B'";
+  formulaInput.value = examples[exampleIndex % examples.length];
+  exampleIndex++;
   runSimplify();
 });
 
@@ -504,4 +609,11 @@ clearBtn.addEventListener("click", () => {
   formulaInput.focus();
 });
 
-window.BooleanSimplifier = { simplifyBoolean, parseBoolean, cleanOcrText };
+window.BooleanSimplifier = {
+  simplifyBoolean,
+  parseBoolean,
+  cleanOcrText,
+  tokenize,
+  formatVariable,
+  normalizeVisualSymbols
+};
