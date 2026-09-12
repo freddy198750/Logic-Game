@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="เว็บย่อสมการ Boolean จากสูตรที่พิมพ์หรือรูปภาพด้วย OCR" />
+  <title>Boolean Simplifier — ย่อสมการจากสูตรหรือรูป</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div class="badge">Boolean Logic • OCR • Web</div>
+      <h1>Boolean Simplifier</h1>
+      <p>พิมพ์สูตร หรือแนบรูปสมการ แล้วให้เว็บช่วยอ่านและย่อให้อยู่ในรูป SOP ที่สั้นลง</p>
+    </header>
+
+    <section class="grid">
+      <article class="card input-card">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">INPUT</span>
+            <h2>ใส่สมการ</h2>
+          </div>
+          <button id="exampleBtn" class="ghost-btn" type="button">ลองตัวอย่าง</button>
+        </div>
+
+        <label for="formulaInput">สูตร Boolean</label>
+        <textarea id="formulaInput" rows="5" spellcheck="false" autocomplete="off" placeholder="เช่น A*B + A*B' หรือ AB + AB'"></textarea>
+
+        <div class="notation">
+          <span><code>+</code> OR</span>
+          <span><code>*</code> AND</span>
+          <span><code>A'</code> NOT</span>
+          <span><code>AB</code> = A AND B</span>
+        </div>
+
+        <div class="divider"><span>หรือ</span></div>
+
+        <label class="upload-zone" for="imageInput">
+          <input id="imageInput" type="file" accept="image/*" capture="environment" />
+          <span class="upload-icon">⌁</span>
+          <strong>แนบรูปสมการ</strong>
+          <small>รองรับ JPG, PNG และรูปจากกล้องมือถือ</small>
+        </label>
+
+        <div id="previewWrap" class="preview-wrap" hidden>
+          <img id="preview" alt="ภาพสมการที่เลือก" />
+          <div class="ocr-row">
+            <div class="ocr-info">
+              <strong>OCR</strong>
+              <span id="ocrStatus">ยังไม่ได้เลือกรูป</span>
+              <div class="progress-track" aria-hidden="true"><div id="ocrProgress" class="progress-bar"></div></div>
+            </div>
+            <button id="ocrBtn" class="secondary-btn" type="button" disabled>อ่านข้อความจากรูป</button>
+          </div>
+        </div>
+
+        <div id="errorBox" class="error" role="alert" hidden></div>
+
+        <div class="actions">
+          <button id="simplifyBtn" class="primary-btn" type="button">ย่อสมการ</button>
+          <button id="clearBtn" class="ghost-btn" type="button">ล้างทั้งหมด</button>
+        </div>
+        <p class="shortcut">บนคอมกด <kbd>Ctrl</kbd> + <kbd>Enter</kbd> เพื่อย่อได้ทันที</p>
+      </article>
+
+      <article class="card result-card">
+        <span class="eyebrow">RESULT</span>
+        <h2>ผลลัพธ์</h2>
+
+        <div class="empty-state" id="emptyState">
+          <div class="logic-mark">01</div>
+          <p>ใส่สูตรหรืออ่านข้อความจากรูป แล้วกด <strong>ย่อสมการ</strong></p>
+        </div>
+
+        <div id="resultBox" hidden>
+          <div class="result-label">สมการที่ย่อแล้ว</div>
+          <div id="resultFormula" class="result-formula"></div>
+
+          <div class="normalized-block">
+            <span>โปรแกรมตีความสูตรเป็น</span>
+            <code id="normalizedFormula"></code>
+          </div>
+
+          <div id="resultMeta" class="result-meta"></div>
+
+          <div class="method-note">
+            <strong>วิธีที่ใช้</strong>
+            <p>สร้าง Truth Table → หา minterm → Quine–McCluskey → เลือกชุด Prime Implicant ที่ใช้จำนวนพจน์น้อยที่สุด และใช้ literal น้อยกว่าเมื่อจำนวนพจน์เท่ากัน</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="card help-card">
+      <h2>ตัวอย่างที่รองรับ</h2>
+      <div class="examples">
+        <code>AB + AB'</code>
+        <span>→</span>
+        <strong>A</strong>
+        <code>A + AB</code>
+        <span>→</span>
+        <strong>A</strong>
+        <code>(A+B)(A+B')</code>
+        <span>→</span>
+        <strong>A</strong>
+      </div>
+      <p>รองรับตัวแปร A–Z สูงสุด 8 ตัวต่อสูตร รูปที่เป็นตัวพิมพ์หรือเขียนชัดจะอ่านได้ดีกว่าลายมือที่ซ้อนกัน หาก OCR อ่านผิดสามารถแก้สูตรในช่องข้อความก่อนย่อได้</p>
+    </section>
+
+    <footer>
+      <span>Boolean Simplifier</span>
+      <span>ทำงานในเบราว์เซอร์ • ไม่ต้องส่งรูปไปยังเซิร์ฟเวอร์ของโปรเจกต์</span>
+    </footer>
+  </main>
+</body>
+</html>
