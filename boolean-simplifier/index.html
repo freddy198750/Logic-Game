@@ -5,14 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Boolean Simplifier — พิมพ์สูตรหรือใช้รูปเพื่อย่อสมการ Boolean" />
   <title>Boolean Simplifier</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="v3.css" />
-  <link rel="stylesheet" href="v4.css" />
-  <link rel="stylesheet" href="v5.css" />
+  <link rel="stylesheet" href="styles.css?v=6" />
+  <link rel="stylesheet" href="v3.css?v=6" />
+  <link rel="stylesheet" href="v4.css?v=6" />
+  <link rel="stylesheet" href="v5.css?v=6" />
+  <link rel="stylesheet" href="v6.css?v=6" />
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
-  <script src="app.js" defer></script>
-  <script src="v3.js" defer></script>
-  <script src="v4.js" defer></script>
+  <script src="app.js?v=6" defer></script>
+  <script src="v3.js?v=6" defer></script>
+  <script src="v4.js?v=6" defer></script>
 </head>
 <body>
   <main class="shell calculator-shell">
@@ -24,11 +25,8 @@
       </div>
     </nav>
 
-    <header class="calc-header">
-      <div>
-        <span class="eyebrow">BOOLEAN SIMPLIFIER</span>
-        <h1>ย่อสมการ</h1>
-      </div>
+    <header class="calc-header minimal-header">
+      <h1>ย่อสมการ</h1>
       <button id="exampleBtn" class="ghost-btn" type="button">ตัวอย่าง</button>
     </header>
 
@@ -84,30 +82,33 @@
 
       <article class="card result-card compact-result-card">
         <div class="result-topline">
-          <span class="eyebrow">RESULT</span>
-          <a class="tiny-doc-link" href="docs.html">ดูคู่มือ →</a>
+          <h2>ผลลัพธ์</h2>
+          <a class="tiny-doc-link" href="docs.html">คู่มือ</a>
         </div>
 
-        <div class="empty-state" id="emptyState">
+        <div class="empty-state clean-empty" id="emptyState">
           <div class="logic-mark">01</div>
-          <p>ผลลัพธ์จะแสดงที่นี่</p>
         </div>
 
         <div id="resultBox" hidden>
-          <div class="result-label">คำตอบ</div>
           <div id="resultFormula" class="result-formula"></div>
-
           <div class="normalized-block">
-            <span>ตีความเป็น</span>
+            <span>สูตรที่โปรแกรมอ่าน</span>
             <code id="normalizedFormula"></code>
           </div>
-
           <div id="resultMeta" class="result-meta"></div>
+          <div class="method-note compact-method">
+            <strong>Minimal SOP</strong>
+          </div>
         </div>
 
         <div id="batchResults" class="batch-results" hidden></div>
       </article>
     </section>
+
+    <footer class="minimal-footer">
+      <span>Boolean Simplifier</span>
+    </footer>
   </main>
 </body>
 </html>
