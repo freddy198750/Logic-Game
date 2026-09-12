@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="เว็บย่อสมการ Boolean จากสูตรที่พิมพ์หรือรูปภาพด้วย OCR" />
+  <meta name="description" content="เว็บย่อสมการ Boolean จากสูตรที่พิมพ์หรือรูปภาพด้วย OCR รองรับ BAR, XOR, XNOR และตัวแปรตั้งชื่อเอง" />
   <title>Boolean Simplifier — ย่อสมการจากสูตรหรือรูป</title>
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
@@ -12,9 +12,9 @@
 <body>
   <main class="shell">
     <header class="hero">
-      <div class="badge">Boolean Logic • OCR • Web</div>
+      <div class="badge">Boolean Logic • OCR • BAR • XOR</div>
       <h1>Boolean Simplifier</h1>
-      <p>พิมพ์สูตร หรือแนบรูปสมการ แล้วให้เว็บช่วยอ่านและย่อให้อยู่ในรูป SOP ที่สั้นลง</p>
+      <p>พิมพ์สูตร หรือแนบรูปสมการ แล้วให้เว็บช่วยอ่านและย่อให้อยู่ในรูป SOP ที่สั้นลง พร้อมรองรับสัญลักษณ์ Boolean หลายรูปแบบ</p>
     </header>
 
     <section class="grid">
@@ -24,17 +24,33 @@
             <span class="eyebrow">INPUT</span>
             <h2>ใส่สมการ</h2>
           </div>
-          <button id="exampleBtn" class="ghost-btn" type="button">ลองตัวอย่าง</button>
+          <button id="exampleBtn" class="ghost-btn" type="button">สุ่มตัวอย่าง</button>
         </div>
 
         <label for="formulaInput">สูตร Boolean</label>
-        <textarea id="formulaInput" rows="5" spellcheck="false" autocomplete="off" placeholder="เช่น A*B + A*B' หรือ AB + AB'"></textarea>
+        <textarea id="formulaInput" rows="5" spellcheck="false" autocomplete="off" placeholder="เช่น X⊕Y, BAR(X+Y), Sensor*Enable + Sensor*Enable'"></textarea>
+
+        <div class="symbol-toolbar" aria-label="แทรกสัญลักษณ์ Boolean">
+          <button type="button" class="symbol-btn" data-insert=" + " title="OR">∨ <small>OR</small></button>
+          <button type="button" class="symbol-btn" data-insert=" * " title="AND">∧ <small>AND</small></button>
+          <button type="button" class="symbol-btn" data-insert="!" title="NOT">¬ <small>NOT</small></button>
+          <button type="button" class="symbol-btn" data-insert=" ⊕ " title="Exclusive OR">⊕ <small>XOR</small></button>
+          <button type="button" class="symbol-btn" data-insert=" ⊙ " title="Exclusive NOR">⊙ <small>XNOR</small></button>
+          <button type="button" class="symbol-btn" data-template="BAR()" data-cursor-back="1" title="ขีดบนทั้งกลุ่ม"><span class="mini-overbar">ABC</span> <small>BAR</small></button>
+          <button type="button" class="symbol-btn" data-template="()" data-cursor-back="1" title="วงเล็บ">( )</button>
+        </div>
 
         <div class="notation">
-          <span><code>+</code> OR</span>
-          <span><code>*</code> AND</span>
-          <span><code>A'</code> NOT</span>
-          <span><code>AB</code> = A AND B</span>
+          <span><code>+</code> / <code>∨</code> OR</span>
+          <span><code>*</code> / <code>∧</code> AND</span>
+          <span><code>X'</code> / <code>X̅</code> NOT</span>
+          <span><code>⊕</code> / <code>^</code> XOR</span>
+          <span><code>⊙</code> XNOR</span>
+        </div>
+
+        <div class="variable-note">
+          <strong>ตัวแปรไม่ล็อก A/B:</strong>
+          ใช้ <code>X</code>, <code>Y</code>, <code>Z</code>, <code>Q1</code>, <code>Sensor</code>, <code>Input_A</code> ได้เลย และถ้าต้องการชื่อพิมพ์ใหญ่หลายตัว เช่น INPUT ให้เขียน <code>[INPUT]</code>
         </div>
 
         <div class="divider"><span>หรือ</span></div>
@@ -96,19 +112,50 @@
     </section>
 
     <section class="card help-card">
-      <h2>ตัวอย่างที่รองรับ</h2>
-      <div class="examples">
-        <code>AB + AB'</code>
-        <span>→</span>
-        <strong>A</strong>
-        <code>A + AB</code>
-        <span>→</span>
-        <strong>A</strong>
-        <code>(A+B)(A+B')</code>
-        <span>→</span>
-        <strong>A</strong>
+      <div class="help-title-row">
+        <div>
+          <span class="eyebrow">SYNTAX</span>
+          <h2>สัญลักษณ์พิเศษใส่ยังไง</h2>
+        </div>
       </div>
-      <p>รองรับตัวแปร A–Z สูงสุด 8 ตัวต่อสูตร รูปที่เป็นตัวพิมพ์หรือเขียนชัดจะอ่านได้ดีกว่าลายมือที่ซ้อนกัน หาก OCR อ่านผิดสามารถแก้สูตรในช่องข้อความก่อนย่อได้</p>
+
+      <div class="syntax-grid">
+        <div class="syntax-item">
+          <div class="syntax-symbol"><span class="overbar">X</span></div>
+          <strong>NOT / Bar ตัวเดียว</strong>
+          <code>X̅</code>
+          <span>หรือ <code>X'</code>, <code>!X</code>, <code>¬X</code></span>
+        </div>
+        <div class="syntax-item">
+          <div class="syntax-symbol"><span class="overbar">X + Y</span></div>
+          <strong>Bar ยาวครอบทั้งกลุ่ม</strong>
+          <code>BAR(X+Y)</code>
+          <span>เหมือน <code>(X+Y)'</code></span>
+        </div>
+        <div class="syntax-item">
+          <div class="syntax-symbol">X ⊕ Y</div>
+          <strong>Exclusive OR</strong>
+          <code>X ⊕ Y</code>
+          <span>หรือ <code>X ^ Y</code>, <code>X XOR Y</code></span>
+        </div>
+        <div class="syntax-item">
+          <div class="syntax-symbol">X ⊙ Y</div>
+          <strong>Exclusive NOR</strong>
+          <code>X ⊙ Y</code>
+          <span>หรือ <code>X XNOR Y</code></span>
+        </div>
+      </div>
+
+      <h2 class="example-heading">ตัวอย่างการย่อ</h2>
+      <div class="example-list">
+        <div><code>CD + CD'</code><span>→</span><strong>C</strong></div>
+        <div><code>X ⊕ Y</code><span>→</span><strong>X'·Y + X·Y'</strong></div>
+        <div><code>BAR(X+Y)</code><span>→</span><strong>X'·Y'</strong></div>
+        <div><code>Sensor*Enable + Sensor*Enable'</code><span>→</span><strong>Sensor</strong></div>
+        <div><code>[INPUT]*Q1 + [INPUT]*Q1'</code><span>→</span><strong>[INPUT]</strong></div>
+      </div>
+
+      <p class="help-note">รองรับได้สูงสุด 8 ตัวแปรต่อสูตร เพื่อให้การสร้าง Truth Table และการย่อทำงานเร็วในเบราว์เซอร์ รูปที่พิมพ์หรือเขียนชัดจะ OCR ได้ดีที่สุด โดยเฉพาะเส้น Bar จากลายมืออาจถูก OCR มองข้าม จึงมีปุ่ม BAR ให้กดเพิ่มหรือแก้สูตรก่อนย่อได้</p>
     </section>
 
     <footer>
