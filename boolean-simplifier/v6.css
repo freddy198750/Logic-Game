@@ -1,0 +1,191 @@
+/* V6 — cleaner calculator + stable documentation cards */
+
+/* Calculator: keep the working surface intentionally minimal. */
+.calculator-shell .variable-note,
+.calculator-shell .notation,
+.calculator-shell .shortcut,
+.calculator-shell .quick-doc-card,
+.calculator-shell .hero,
+.calculator-shell .empty-state p,
+.calculator-shell .result-label {
+  display: none !important;
+}
+
+.minimal-header {
+  margin-top: 22px;
+}
+
+.minimal-header h1 {
+  margin: 0;
+}
+
+.clean-empty {
+  min-height: 280px !important;
+}
+
+.compact-method {
+  padding-top: 12px;
+  margin-top: 14px;
+}
+
+.minimal-footer {
+  justify-content: flex-start;
+  padding-top: 16px;
+}
+
+/* Documentation layout: every card uses the same content width. */
+.docs-shell {
+  width: min(1080px, calc(100% - 28px));
+  max-width: none;
+  padding-top: 24px;
+}
+
+.docs-shell .top-nav {
+  margin-bottom: 28px;
+}
+
+.docs-hero {
+  width: 100%;
+  max-width: none;
+  margin-bottom: 22px;
+}
+
+.docs-hero h1 {
+  font-size: clamp(38px, 6vw, 64px);
+}
+
+.docs-layout {
+  width: 100%;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 16px;
+}
+
+.docs-content {
+  width: 100%;
+  min-width: 0;
+  gap: 12px;
+}
+
+.doc-section {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 22px;
+  overflow: hidden;
+}
+
+.doc-section h2 {
+  margin-top: 4px;
+}
+
+.docs-toc {
+  width: 100%;
+  min-width: 0;
+  border-radius: 18px;
+}
+
+.doc-table-wrap,
+.doc-code,
+.doc-example,
+.circuit-results,
+.doc-choice-grid {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.doc-table-wrap {
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+.doc-table {
+  min-width: 560px;
+}
+
+.doc-section code,
+.doc-section strong,
+.circuit-results code,
+.circuit-results strong {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 900px) {
+  .docs-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .docs-toc {
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .docs-toc strong {
+    grid-column: 1 / -1;
+  }
+
+  .docs-toc a {
+    text-align: center;
+    border: 1px solid var(--line);
+  }
+}
+
+@media (max-width: 600px) {
+  .calculator-shell,
+  .docs-shell {
+    width: min(100% - 16px, 1080px);
+    padding-top: 10px;
+  }
+
+  .calculator-shell .top-nav,
+  .docs-shell .top-nav {
+    margin-bottom: 18px;
+  }
+
+  .clean-empty {
+    min-height: 150px !important;
+  }
+
+  .logic-mark {
+    width: 72px;
+    height: 72px;
+    border-radius: 20px;
+    font-size: 24px;
+  }
+
+  .docs-hero {
+    margin-bottom: 16px;
+  }
+
+  .docs-hero p {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .docs-toc {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 12px;
+  }
+
+  .doc-section {
+    padding: 17px;
+    border-radius: 18px;
+  }
+
+  .doc-section p,
+  .doc-section li {
+    line-height: 1.65;
+  }
+
+  .doc-choice-grid,
+  .circuit-results > div,
+  .doc-example {
+    grid-template-columns: 1fr;
+  }
+
+  .doc-table {
+    min-width: 500px;
+  }
+}
